@@ -18,25 +18,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   title,
   description,
   link,
-  className, // Destructure className
+  className,
 }) => {
-  const handleClick = () => {
-    if (typeof window === "undefined") return;
-    try {
-      const scrollY = window.scrollY || window.pageYOffset ;
-      const state = history.state || {};
-      // store previous scroll position on history state so it can be restored later
-      history.replaceState({ ...state, prevScroll: scrollY }, document.title);
-    } catch (e) {
-      // ignore errors
-    }
-  };
   return (
     <div
-      className={`flex flex-col rounded-[10px] overflow-hidden shadow-lg group project-card ${className}`} // Add className for styling flexibility
+      className={`flex flex-col rounded-[10px] overflow-hidden shadow-lg group project-card ${className}`}
       style={{
-        width: "100%", // Make the card responsive
-        maxWidth: "350px", // Max width for large screens
+        width: "100%",
+        maxWidth: "350px",
       }}
     >
       <div className="h-[273px] overflow-hidden">
@@ -50,8 +39,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         <h3 className="text-offwhite font-bold text-lg">{title}</h3>
         {description && <p className="text-offwhite text-sm text-center">{description}</p>}
         <Link
-          href={link ? link : `/projects/${id}`} // Correct dynamic route
-          onClick={handleClick}
+          href={link ? link : `/projects/${id}`}
           className="bg-[#F8F8F8] text-[#1E1E1E] border border-[#F68620] px-4 py-2 rounded-[10px] text-sm font-medium transition-colors"
         >
           See Details

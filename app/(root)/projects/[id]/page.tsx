@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 import Link from "next/link";
+import gsap from "gsap";
 import { projects } from "@/app/components/ProjectSections/ProjectData";
 
 const ProjectDetail: React.FC = () => {
@@ -12,18 +13,35 @@ const ProjectDetail: React.FC = () => {
 
   const id = params?.id as string;
 
-  // ✅ Get project from single source of truth
+  const backRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+
   const project = useMemo(() => {
     return projects.find((p) => p.id === Number(id));
   }, [id]);
 
-  // ✅ Restore scroll position when navigating back
+  // Entrance animation on mount
   useEffect(() => {
-    const saved = history.state?.prevScroll;
-    if (typeof saved === "number") {
-      requestAnimationFrame(() => window.scrollTo(0, saved));
-    }
-  }, []);
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      if (backRef.current) {
+        gsap.set(backRef.current, { autoAlpha: 0, x: -40 });
+        tl.to(backRef.current, { autoAlpha: 1, x: 0, duration: 0.6 });
+      }
+      if (imageRef.current) {
+        gsap.set(imageRef.current, { autoAlpha: 0, scale: 0.97, y: 20 });
+        tl.to(imageRef.current, { autoAlpha: 1, scale: 1, y: 0, duration: 0.7 }, "-=0.3");
+      }
+      if (descRef.current) {
+        gsap.set(descRef.current, { autoAlpha: 0, y: 25 });
+        tl.to(descRef.current, { autoAlpha: 1, y: 0, duration: 0.6 }, "-=0.3");
+      }
+    });
+
+    return () => ctx.revert();
+  }, [project]);
 
   if (!project) {
     return (
@@ -50,16 +68,14 @@ const ProjectDetail: React.FC = () => {
     <main className="bg-[#F8F8F8] min-h-screen py-50 px-6 md:px-16 lg:px-24 text-[#191919]">
 
       {/* Back Button + Title */}
-      <div className="max-w-6xl mx-auto mb-10">
+      <div ref={backRef} className="max-w-6xl mx-auto mb-10">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-3 mb-6 hover:opacity-70 transition"
         >
-          <BiArrowBack size={30}  className="text-[#1E1E1E]"/>
+          <BiArrowBack size={30} className="text-[#1E1E1E]" />
           <h2 className="text-3xl md:text-4xl font-bold">{project.title}</h2>
         </button>
-
-        
       </div>
 
       {/* Content */}
@@ -69,7 +85,7 @@ const ProjectDetail: React.FC = () => {
         </h1>
 
         {/* Image */}
-        <div className="w-full rounded-lg overflow-hidden shadow-md">
+        <div ref={imageRef} className="w-full rounded-lg overflow-hidden shadow-md">
           <img
             src={project.image}
             alt={project.title}
@@ -78,7 +94,7 @@ const ProjectDetail: React.FC = () => {
         </div>
 
         {/* Description */}
-        <div className="max-w-3xl">
+        <div ref={descRef} className="max-w-3xl">
           <p className="text-gray-700 leading-relaxed text-base md:text-lg">
             {project.description}
           </p>

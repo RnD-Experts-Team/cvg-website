@@ -1,11 +1,10 @@
-"use client"; // Marking as a client component
+"use client";
 
-import React, { useEffect, useRef } from "react";
-import StepCard from "./StepCard"; // Import the StepCard component
-import gsap from "gsap"; // GSAP for animation
+import React from "react";
+import StepCard from "./StepCard";
+import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
 
 const ProcessSection: React.FC = () => {
-  // Data for process steps
   const processData = [
     { stepNumber: "1", title: "Step One", description: "Lorem ipsum dolor sit amet." },
     { stepNumber: "2", title: "Step Two", description: "Lorem ipsum dolor sit amet." },
@@ -14,20 +13,13 @@ const ProcessSection: React.FC = () => {
     { stepNumber: "5", title: "Step Five", description: "Lorem ipsum dolor sit amet." },
   ];
 
-  // Ref for GSAP targeting the container
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // GSAP animation effect when the component mounts
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    gsap.fromTo(
-      ".process-card", 
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, stagger: 0.2, duration: 1, ease: "power3.out" }
-    );
-  }, []);
+  const containerRef = useScrollAnimation<HTMLDivElement>({
+    childSelector: ".process-card",
+    from: { autoAlpha: 0, y: 50 },
+    stagger: 0.15,
+    duration: 0.8,
+    start: "top 85%",
+  });
 
   return (
     <section

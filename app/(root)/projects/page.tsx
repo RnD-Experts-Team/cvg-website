@@ -5,6 +5,13 @@ import ProjectCard from "@/app/components/ProjectSections/ProjectCard";
 import { projects } from "@/app/components/ProjectSections/ProjectData";
 import { ProjectCategory } from "@/types/projects";
 import { useState, useMemo } from "react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const categories: ProjectCategory[] = [
   "Pizza Stores",
@@ -27,6 +34,67 @@ const categoryDescriptions: Record<ProjectCategory, string> = {
 export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] =
     useState<ProjectCategory>("Pizza Stores");
+
+  const headerRef = useRef<HTMLDivElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  // Entrance animation (once on mount)
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      if (headerRef.current) {
+        gsap.set(headerRef.current, { autoAlpha: 0, y: -30 });
+        tl.to(headerRef.current, { autoAlpha: 1, y: 0, duration: 0.7 });
+      }
+
+      if (tabsRef.current) {
+        const tabs = tabsRef.current.querySelectorAll("button");
+        gsap.set(tabs, { autoAlpha: 0, y: 20 });
+        tl.to(tabs, { autoAlpha: 1, y: 0, stagger: 0.08, duration: 0.5 }, "-=0.3");
+      }
+
+      if (gridRef.current) {
+        const cards = gridRef.current.querySelectorAll(".project-card");
+        gsap.set(cards, { autoAlpha: 0, y: 40 });
+        tl.to(cards, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 0.6 }, "-=0.2");
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Re-animate cards on category change (skip first render)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const container = gridRef.current;
+    if (!container) return;
+
+    const cards = container.querySelectorAll(".project-card");
+    if (!cards.length) return;
+
+    gsap.killTweensOf(cards);
+    gsap.fromTo(
+      cards,
+      { autoAlpha: 0, y: 30, scale: 0.96 },
+      { autoAlpha: 1, y: 0, scale: 1, stagger: 0.08, duration: 0.45, ease: "power3.out" }
+    );
+
+    // Animate description
+    if (descRef.current) {
+      gsap.fromTo(
+        descRef.current,
+        { autoAlpha: 0, y: 15 },
+        { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out", delay: 0.15 }
+      );
+    }
+  }, [activeCategory]);
 
   const filteredProjects = useMemo(
     () => projects.filter((project) => project.category === activeCategory),
@@ -70,9 +138,11 @@ export default function ProjectsPage() {
     
     <section className="bg-[#F8F8F8] pt-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#191919] mb-8">
-          Our Projects
-        </h1>
+        <div ref={headerRef}>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#191919] mb-8">
+            Our Projects
+          </h1>
+        </div>
 
         {/* Category Tabs (accessible + scrollable on small screens) */}
         <nav
@@ -80,7 +150,7 @@ export default function ProjectsPage() {
           aria-label="Project categories"
           className="mb-8 flex justify-center flex-wrap"
         >
-          <div className="-mx-4 sm:mx-0 overflow-x-auto">
+          <div ref={tabsRef} className="-mx-4 sm:mx-0 overflow-x-auto">
             <div className="inline-flex flex-wrap justify-center gap-3 px-4 sm:px-0">
               {categories.map((category, idx) => {
                 const isActive = activeCategory === category;
@@ -112,7 +182,7 @@ export default function ProjectsPage() {
         </nav>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 md:gap-8 items-stretch">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 md:gap-8 items-stretch">
           {filteredProjects.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
               No projects found for <strong>{activeCategory}</strong>.
@@ -127,7 +197,7 @@ export default function ProjectsPage() {
         </div>
 
         {/* Category Description */}
-        <div className="mt-13 text-start max-w-3xl mx-auto" aria-live="polite">
+        <div ref={descRef} className="mt-13 text-start max-w-3xl mx-auto" aria-live="polite">
           <h2 className="text-xl sm:text-2xl font-bold mb-3 text-[#191919]">
             {activeCategory}
           </h2>

@@ -1,45 +1,26 @@
-"use client"; // Marking this as a client component
+"use client";
 
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap"; // Import GSAP for smooth animation
+import React from "react";
+import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
 
 const AboutSection: React.FC = () => {
-  // Refs for animation targeting
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-  const textRef = useRef<HTMLDivElement | null>(null);
-  const imageRef = useRef<HTMLDivElement | null>(null);
+  const textRef = useScrollAnimation<HTMLDivElement>({
+    from: { autoAlpha: 0, x: -60 },
+    duration: 0.9,
+    animateContainer: true,
+    start: "top 80%",
+  });
 
-  // GSAP animation on component mount
-  useEffect(() => {
-    if (sectionRef.current) {
-      gsap.fromTo(
-        sectionRef.current,
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
-      );
-    }
-
-    if (textRef.current) {
-      gsap.fromTo(
-        textRef.current,
-        { opacity: 0, x: -100 },
-        { opacity: 1, x: 0, duration: 1, ease: "power3.out", delay: 0.3 },
-      );
-    }
-
-    if (imageRef.current) {
-      gsap.fromTo(
-        imageRef.current,
-        { opacity: 0, x: 100 },
-        { opacity: 1, x: 0, duration: 1, ease: "power3.out", delay: 0.3 },
-      );
-    }
-  }, []);
+  const imageRef = useScrollAnimation<HTMLDivElement>({
+    from: { autoAlpha: 0, x: 60 },
+    duration: 0.9,
+    animateContainer: true,
+    start: "top 80%",
+  });
 
   return (
     <section
       id="about"
-      ref={sectionRef}
       className="bg-[#F8F8F8] py-12 px-6 md:px-20 min-h-[600px]"
     >
       <div className="max-w-[1440px] mx-auto">

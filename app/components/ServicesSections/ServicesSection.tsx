@@ -2,29 +2,56 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
-import { useRouter } from "next/navigation";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaChevronDown } from "react-icons/fa6";
 
 import ServiceCard from "./ServiceCard";
 import { services } from "./ServiceData";
 
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 const ServicesSection: React.FC = () => {
-  const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const hasScrollTriggered = useRef(false);
 
   const [showMore, setShowMore] = useState(false);
 
-  // Visible services count (no need for extra state)
-  const visibleServices = showMore
-    ? services
-    : services.slice(0, 4);
+  const visibleServices = showMore ? services : services.slice(0, 4);
 
   const toggleShowMore = () => {
     setShowMore((prev) => !prev);
   };
 
-  // Smooth lightweight animation
+  // Initial scroll-triggered animation (plays once)
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container || hasScrollTriggered.current) return;
+
+    const cards = container.querySelectorAll(".service-card");
+    if (!cards.length) return;
+
+    gsap.set(cards, { autoAlpha: 0, y: 40 });
+
+    gsap.to(cards, {
+      autoAlpha: 1,
+      y: 0,
+      stagger: 0.1,
+      duration: 0.7,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: container,
+        start: "top 85%",
+        toggleActions: "play none none none",
+        onEnter: () => { hasScrollTriggered.current = true; },
+      },
+    });
+  }, []);
+
+  // Animate newly revealed cards when "Show More" is toggled
+  useEffect(() => {
+    if (!hasScrollTriggered.current) return;
     const container = containerRef.current;
     if (!container) return;
 
