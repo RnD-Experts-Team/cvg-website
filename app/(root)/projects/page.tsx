@@ -1,11 +1,10 @@
 "use client";
 
+import ContactForm from "@/app/components/contact/ContactForm";
+import ProjectCard from "@/app/components/ProjectSections/ProjectCard";
+import { projects } from "@/app/components/ProjectSections/ProjectData";
 import { ProjectCategory } from "@/types/projects";
 import { useState, useMemo } from "react";
-import { projects } from "../components/ProjectSections/ProjectData";
-import ProjectCard from "../components/ProjectSections/ProjectCard";
-import ContactForm from "../components/contact/ContactForm";
-
 
 const categories: ProjectCategory[] = [
   "Pizza Stores",
@@ -68,6 +67,7 @@ export default function ProjectsPage() {
   };
 
   return (
+    
     <section className="bg-[#F8F8F8] pt-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#191919] mb-8">

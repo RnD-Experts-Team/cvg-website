@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import { services } from "../components/ServicesSections/ServiceData";
-import ContactForm from "../components/contact/ContactForm";
+import { services } from "@/app/components/ServicesSections/ServiceData";
+import ContactForm from "@/app/components/contact/ContactForm";
 
 export default function ServicesPage() {
   const containerRef = useRef<HTMLDivElement>(null);
