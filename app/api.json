@@ -1,0 +1,2234 @@
+{
+  "info": {
+    "_postman_id": "4d77f160-1b07-4e5d-8656-0e46d8648729",
+    "name": "CVG_CMS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52027889",
+    "_collection_link": "https://go.postman.co/collection/52027889-4d77f160-1b07-4e5d-8656-0e46d8648729?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "email",
+                  "value": "admin@example.com",
+                  "type": "text",
+                  "uuid": "de7426f1-70ef-42c0-a315-e4dab20d6777"
+                },
+                {
+                  "key": "password",
+                  "value": "password",
+                  "type": "text",
+                  "uuid": "65851861-7835-41a0-b584-a9aec37efa48"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/api/auth/login",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{Admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{url}}/api/auth/logout",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public CMS",
+      "item": [
+        {
+          "name": "get home page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\home",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "home"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\categories",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\projects",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get projects by category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\projects\\category\\technology",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "category",
+                "technology"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get projects by slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\projects\\project-one",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "project-one"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}\\api\\services",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "contact-submissions",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"full_name\": \"ebaa\",\r\n  \"email\": \"ebaa@example.com\",\r\n  \"phone_number\": \"+1 564 456\",\r\n  \"project_details\": \"sdfdsfsdf\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}\\api\\contact-submissions",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "contact-submissions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin CMS",
+      "item": [
+        {
+          "name": "site metadata",
+          "item": [
+            {
+              "name": "get site metadata",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\site-metadata",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "site-metadata"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update site metadata",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "eUpdated CMS Nam",
+                      "type": "text",
+                      "uuid": "179371ff-e5c1-4894-ac02-5d346f2e4fc6"
+                    },
+                    {
+                      "key": "description",
+                      "value": "This is the updated description of My CMS.",
+                      "type": "text",
+                      "uuid": "ab5717ed-ef3b-4298-b4d7-2d03a4f1c4f4"
+                    },
+                    {
+                      "key": "keywords",
+                      "value": "updated, cms, website, laravel",
+                      "type": "text",
+                      "uuid": "bfcd8797-21d8-4cc7-8fac-87b2dc6e9994"
+                    },
+                    {
+                      "key": "logo",
+                      "type": "file",
+                      "uuid": "f6d8a042-d4d8-45cd-98dc-78632c35e6c9",
+                      "src": "postman-cloud:///1f1028db-7824-4c10-a90a-0aa9ed40d74f",
+                      "disabled": true
+                    },
+                    {
+                      "key": "favicon",
+                      "type": "file",
+                      "uuid": "16ca57b7-3856-480a-909b-21dc8a787bfd",
+                      "src": "postman-cloud:///1f1028db-7824-4c10-a90a-0aa9ed40d74f",
+                      "disabled": true
+                    },
+                    {
+                      "key": "logo_alt_text",
+                      "value": "fd",
+                      "type": "text",
+                      "uuid": "3742a92f-1350-488d-946c-ab8d6985236d"
+                    },
+                    {
+                      "key": "logo_title",
+                      "value": "ff",
+                      "type": "text",
+                      "uuid": "295fe731-784f-4e33-8a79-0263a44b58fc"
+                    },
+                    {
+                      "key": "favicon_alt_text",
+                      "value": "ggg",
+                      "type": "text",
+                      "uuid": "0c4a66fc-457b-4495-8889-41f313de59f7"
+                    },
+                    {
+                      "key": "favicon_title",
+                      "value": "ggg",
+                      "type": "text",
+                      "uuid": "61f0ac4c-9641-45d5-9d1c-1a3ed17b3176"
+                    },
+                    {
+                      "key": "title",
+                      "value": "CMS",
+                      "type": "text",
+                      "uuid": "e260d352-68af-4ad5-9e8a-b1b31e22db93"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\site-metadata",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "site-metadata"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "footer",
+          "item": [
+            {
+              "name": "get footer",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Updated CMS Name\",\r\n  \"description\": \"This is the updated description of My CMS.\",\r\n  \"keywords\": \"updated, cms, website, laravel\",\r\n  \"logo_media_id\": 1,\r\n  \"favicon_media_id\": 2\r\n}"
+                },
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\footer",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "footer"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update footer",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"contact\": {\r\n    \"phone\": \"+1 (234) 567-8901\",\r\n    \"whatsapp\": \"+1 (987) 654-9870\",\r\n    \"email\": \"newcontact@example.com\",\r\n    \"address\": \"456 Elm St, Springfield, IL\"\r\n  },\r\n  \"social_links\": [\r\n    {\r\n      \"platform\": \"facebook\",\r\n      \"url\": \"https://facebook.com/newpage\",\r\n      \"sort_order\": 1,\r\n      \"is_active\": 1\r\n    },\r\n    {\r\n      \"platform\": \"twitter\",\r\n      \"url\": \"https://facebook.com/newpage\",\r\n      \"sort_order\": 1,\r\n      \"is_active\": 1\r\n    }\r\n  ]\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/footer",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "footer"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "hero",
+          "item": [
+            {
+              "name": "get hero section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\hero",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "hero"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update hero section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Hero section title",
+                      "type": "text",
+                      "uuid": "b00f59ff-26ac-4650-8173-a1826e9e45b2"
+                    },
+                    {
+                      "key": "subtitle",
+                      "value": "Updated subtitle for the hero section",
+                      "type": "text",
+                      "uuid": "ac2f20f3-f6c1-4ab1-9055-36af6038d06e"
+                    },
+                    {
+                      "key": "button_text",
+                      "value": "Learn More",
+                      "type": "text",
+                      "uuid": "2dec4719-cfff-43f2-8577-eaecf090f281"
+                    },
+                    {
+                      "key": "button_link",
+                      "value": "https://example.com/learn-more",
+                      "type": "text",
+                      "uuid": "bb4385db-3c1f-4dc6-9048-5c1b6cfe589d"
+                    },
+                    {
+                      "key": "media[0][file]",
+                      "type": "file",
+                      "uuid": "1353c42a-b6fd-48d3-a656-702a780ac7b9",
+                      "src": "postman-cloud:///1f1028db-7824-4c10-a90a-0aa9ed40d74f"
+                    },
+                    {
+                      "key": "media[0][alt_text]",
+                      "value": "title",
+                      "type": "text",
+                      "uuid": "441d4957-c528-404f-ba32-3b1454fec93c"
+                    },
+                    {
+                      "key": "media[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "24e26774-32e2-4ab9-b270-74fb6fbb5651"
+                    },
+                    {
+                      "key": "media[0][title]",
+                      "value": "title",
+                      "type": "text",
+                      "uuid": "83c5873a-07db-4b45-af64-6846dda5e11e"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\hero",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "hero"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Project Section",
+          "item": [
+            {
+              "name": "get project section",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\projects-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects-section"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update project section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Updated Projects\",\r\n  \"description\": \"Updated description of our projects section\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}\\api\\admin\\projects-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects-section"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "projects CRUD",
+          "item": [
+            {
+              "name": "create project",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "multipart/form-data",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Project ",
+                      "type": "text",
+                      "uuid": "60fc0a40-8f5e-47b9-bcfb-43613256a63e"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Description for Project One",
+                      "type": "text",
+                      "uuid": "1743ecbf-0631-42ba-97f7-51ca385b2a76"
+                    },
+                    {
+                      "key": "content",
+                      "value": "Full content for Project One",
+                      "type": "text",
+                      "uuid": "247070c6-d682-4e2a-ae06-188580ed0777"
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "6c3d4021-b870-4f9d-acd0-7495958781a7"
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "b8540971-00d6-4f4f-80ef-4e9aa44d717d"
+                    },
+                    {
+                      "key": "images[0][file]",
+                      "type": "file",
+                      "uuid": "7c6becae-d628-473f-bac5-2ef68e16cd49",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845"
+                    },
+                    {
+                      "key": "images[0][alt_text]",
+                      "value": "images[0][alt_text]",
+                      "type": "text",
+                      "uuid": "1868ed90-8a91-44f3-acba-b6c049d7357a"
+                    },
+                    {
+                      "key": "images[0][title]",
+                      "value": "Image 1 title",
+                      "type": "text",
+                      "uuid": "ccb5c978-9a3b-469f-a183-914a3bf39501"
+                    },
+                    {
+                      "key": "images[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "764bb87e-9d37-45f8-8012-5677645f382b"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/projects",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get projects",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "multipart/form-data",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Project eee",
+                      "type": "text",
+                      "uuid": "60fc0a40-8f5e-47b9-bcfb-43613256a63e",
+                      "disabled": true
+                    },
+                    {
+                      "key": "description",
+                      "value": "Description for Project One",
+                      "type": "text",
+                      "uuid": "1743ecbf-0631-42ba-97f7-51ca385b2a76",
+                      "disabled": true
+                    },
+                    {
+                      "key": "content",
+                      "value": "Full content for Project One",
+                      "type": "text",
+                      "uuid": "247070c6-d682-4e2a-ae06-188580ed0777",
+                      "disabled": true
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "6c3d4021-b870-4f9d-acd0-7495958781a7",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "b8540971-00d6-4f4f-80ef-4e9aa44d717d",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][file]",
+                      "type": "file",
+                      "uuid": "7c6becae-d628-473f-bac5-2ef68e16cd49",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][alt_text]",
+                      "value": "images[0][alt_text]",
+                      "type": "text",
+                      "uuid": "1868ed90-8a91-44f3-acba-b6c049d7357a",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][title]",
+                      "value": "Image 1 title",
+                      "type": "text",
+                      "uuid": "ccb5c978-9a3b-469f-a183-914a3bf39501",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "764bb87e-9d37-45f8-8012-5677645f382b",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/projects",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update project",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "multipart/form-data",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Project eeee",
+                      "type": "text",
+                      "uuid": "60fc0a40-8f5e-47b9-bcfb-43613256a63e"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Description for Project One",
+                      "type": "text",
+                      "uuid": "1743ecbf-0631-42ba-97f7-51ca385b2a76"
+                    },
+                    {
+                      "key": "content",
+                      "value": "Full content for Project One",
+                      "type": "text",
+                      "uuid": "247070c6-d682-4e2a-ae06-188580ed0777"
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "6c3d4021-b870-4f9d-acd0-7495958781a7"
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "b8540971-00d6-4f4f-80ef-4e9aa44d717d"
+                    },
+                    {
+                      "key": "images[0][file]",
+                      "type": "file",
+                      "uuid": "7c6becae-d628-473f-bac5-2ef68e16cd49",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845"
+                    },
+                    {
+                      "key": "images[0][alt_text]",
+                      "value": "images[0][alt_text]",
+                      "type": "text",
+                      "uuid": "1868ed90-8a91-44f3-acba-b6c049d7357a"
+                    },
+                    {
+                      "key": "images[0][title]",
+                      "value": "Image 1 title",
+                      "type": "text",
+                      "uuid": "ccb5c978-9a3b-469f-a183-914a3bf39501"
+                    },
+                    {
+                      "key": "images[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "764bb87e-9d37-45f8-8012-5677645f382b"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/projects/3",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get project by id",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/projects/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete project",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/projects/3",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "projects",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Categories CRUD",
+          "item": [
+            {
+              "name": "get all categories",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "multipart/form-data",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Project eee",
+                      "type": "text",
+                      "uuid": "60fc0a40-8f5e-47b9-bcfb-43613256a63e",
+                      "disabled": true
+                    },
+                    {
+                      "key": "description",
+                      "value": "Description for Project One",
+                      "type": "text",
+                      "uuid": "1743ecbf-0631-42ba-97f7-51ca385b2a76",
+                      "disabled": true
+                    },
+                    {
+                      "key": "content",
+                      "value": "Full content for Project One",
+                      "type": "text",
+                      "uuid": "247070c6-d682-4e2a-ae06-188580ed0777",
+                      "disabled": true
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "6c3d4021-b870-4f9d-acd0-7495958781a7",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "b8540971-00d6-4f4f-80ef-4e9aa44d717d",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][file]",
+                      "type": "file",
+                      "uuid": "7c6becae-d628-473f-bac5-2ef68e16cd49",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][alt_text]",
+                      "value": "images[0][alt_text]",
+                      "type": "text",
+                      "uuid": "1868ed90-8a91-44f3-acba-b6c049d7357a",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][title]",
+                      "value": "Image 1 title",
+                      "type": "text",
+                      "uuid": "ccb5c978-9a3b-469f-a183-914a3bf39501",
+                      "disabled": true
+                    },
+                    {
+                      "key": "images[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "764bb87e-9d37-45f8-8012-5677645f382b",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/categories",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create category",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "AI",
+                      "type": "text",
+                      "uuid": "f5b7eac7-3820-4058-89fc-e45db710c0ef"
+                    },
+                    {
+                      "key": "description",
+                      "value": "AI work space",
+                      "type": "text",
+                      "uuid": "1b5c3259-a4ef-424d-b25f-07788a66ce20"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/categories",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update category",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "AI_MODEL",
+                      "type": "text",
+                      "uuid": "f5b7eac7-3820-4058-89fc-e45db710c0ef"
+                    },
+                    {
+                      "key": "description",
+                      "value": "AI work space",
+                      "type": "text",
+                      "uuid": "1b5c3259-a4ef-424d-b25f-07788a66ce20"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/categories/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "categories",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get category by id",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "AI",
+                      "type": "text",
+                      "uuid": "f5b7eac7-3820-4058-89fc-e45db710c0ef"
+                    },
+                    {
+                      "key": "description",
+                      "value": "AI work space",
+                      "type": "text",
+                      "uuid": "1b5c3259-a4ef-424d-b25f-07788a66ce20"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/categories/3",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "categories",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete category",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/categories/3",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "categories",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Service section",
+          "item": [
+            {
+              "name": "get service section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/services-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services-section"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update service section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Our Services",
+                      "type": "text",
+                      "uuid": "df2efe68-e8e2-49b7-8e67-9e98896e2341"
+                    },
+                    {
+                      "key": "description",
+                      "value": "We provide high quality solutions.",
+                      "type": "text",
+                      "uuid": "07567b27-5f93-4353-87ee-e31a9dae077c"
+                    },
+                    {
+                      "key": "button_text",
+                      "value": "Explore Services",
+                      "type": "text",
+                      "uuid": "17283ffc-5f8a-4b90-8c1e-519eb3aafaf1"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "uuid": "e5154389-0e7a-4cab-a678-dc380abc3ec1",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845"
+                    },
+                    {
+                      "key": "alt_text",
+                      "value": "title",
+                      "type": "text",
+                      "uuid": "782f1759-4797-48b7-b0fa-52e76054ea86"
+                    },
+                    {
+                      "key": "title",
+                      "value": "title",
+                      "type": "text",
+                      "uuid": "ca40e37e-12e3-4721-b556-fdd64856c750"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/services-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services-section"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Service CRUD",
+          "item": [
+            {
+              "name": "get all services",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Our Services\",\r\n  \"description\": \"We provide high quality solutions.\",\r\n  \"image_media_id\": 1,\r\n  \"button_text\": \"Explore Services\"\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/services",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create service",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "type": "text",
+                      "uuid": "2c237e2d-44fd-485c-9761-8831ed11facc",
+                      "value": "Backend_enffffff"
+                    },
+                    {
+                      "key": "description",
+                      "type": "text",
+                      "uuid": "7caecbd0-6261-4648-a286-f0d2ebc19ee7",
+                      "value": "dfdsafdfds"
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "a3550981-fb07-43ec-922e-882487ae36a8"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "uuid": "12f23843-6f73-4823-b5df-dd21cfb04e33",
+                      "src": "postman-cloud:///1f10cc50-e716-4880-b8ac-5c03c8941845"
+                    },
+                    {
+                      "key": "alt_text",
+                      "value": "dfdf",
+                      "type": "text",
+                      "uuid": "da1a393d-194b-45e3-98d1-7b6622362885"
+                    },
+                    {
+                      "key": "image_title",
+                      "value": "title",
+                      "type": "text",
+                      "uuid": "4b7a242b-e16b-4a82-b74e-fabf49f251d9"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/services",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update service",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "somthing",
+                      "type": "text",
+                      "uuid": "c6c0972d-7bcc-4fa8-be96-c7e93ba012db"
+                    },
+                    {
+                      "key": "description",
+                      "value": "dfsdfsdf",
+                      "type": "text",
+                      "uuid": "f40e26bf-c725-43ae-a6ee-7e988dd8eeda"
+                    },
+                    {
+                      "key": "featured",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "b251a271-d8c9-4b77-8a77-1c0edf83bb76"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "uuid": "3a0dbfcf-6544-4074-84d1-a6aa159c0b73",
+                      "src": "postman-cloud:///1f1028db-7acb-4770-871c-641c436e2c21",
+                      "disabled": true
+                    },
+                    {
+                      "key": "alt_text",
+                      "value": "dsfsfddfdd",
+                      "type": "text",
+                      "uuid": "c988b2ae-3d75-48f3-9dd6-a1af4e58f008"
+                    },
+                    {
+                      "key": "image_title",
+                      "value": "dsfdsfddd",
+                      "type": "text",
+                      "uuid": "fbdf0c50-f935-4843-b570-6748b94fe88e"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/services/14",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services",
+                    "14"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get service by id",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/services/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete service",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/services/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "values section",
+          "item": [
+            {
+              "name": "get all values section",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Backend Development\",\r\n  \"description\": \"We build high performance Application.\",\r\n  \"image_media_id\": 1,\r\n  \"featured\": true\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/values",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "values"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update values section and items",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Our Core Values\",\r\n  \"values\": [\r\n    {\r\n      \"title\": \"Innovation\",\r\n      \"description\": \"We work with honesty.\",\r\n      \"media_id\": 1,\r\n      \"sort_order\": 1\r\n    },\r\n    {\r\n      \"title\": \"Innovation\",\r\n      \"description\": \"We embrace creativity.\",\r\n      \"media_id\": 2,\r\n      \"sort_order\": 2\r\n    },\r\n    {\r\n      \"title\": \"Innovation\",\r\n      \"description\": \"We embrace creativity.\",\r\n      \"media_id\": 2,\r\n      \"sort_order\": 3\r\n    }\r\n  ]\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/values",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "values"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "process section",
+          "item": [
+            {
+              "name": "get process section",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/process",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "process"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update process section with steps",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Our Process",
+                      "type": "text",
+                      "uuid": "629c598f-a3d7-44e2-802a-3ade5da0eb7b"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "uuid": "c8f22fe6-8e91-447b-8fd9-370a373e3ec1",
+                      "src": "postman-cloud:///1f1028db-7acb-4770-871c-641c436e2c21"
+                    },
+                    {
+                      "key": "alt_text",
+                      "value": "sdsdsd",
+                      "type": "text",
+                      "uuid": "b20eb7e1-ce17-443b-8b86-b87501201165"
+                    },
+                    {
+                      "key": "title",
+                      "value": "sdsdsd",
+                      "type": "text",
+                      "uuid": "93a351b6-940d-4081-bc24-c5ab3469c8c7"
+                    },
+                    {
+                      "key": "steps[0][title]",
+                      "value": "steps[0][title]",
+                      "type": "text",
+                      "uuid": "f94c8ba8-06c6-42bb-957a-f2545fb4a717"
+                    },
+                    {
+                      "key": "steps[0][description]",
+                      "value": "Plaining",
+                      "type": "text",
+                      "uuid": "332d2f88-4022-4d70-acef-550a9f1aca45"
+                    },
+                    {
+                      "key": "steps[0][sort_order]",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "cfae3947-a1ca-4964-b830-50c25fbf77d5"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/process",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "process"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "About Section",
+          "item": [
+            {
+              "name": "get about section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/api/admin/about",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "about"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update process section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "About Our Company",
+                      "type": "text",
+                      "uuid": "57e57fc1-021f-4760-8c96-85a66d9558e7"
+                    },
+                    {
+                      "key": "description",
+                      "value": "We are a company that provides CMS solutions and services.",
+                      "type": "text",
+                      "uuid": "86fe1469-ad46-4a3c-a11e-7ccaff5b32cb"
+                    },
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "uuid": "b5220ac8-5090-446e-a7fd-663acadde589",
+                      "src": "postman-cloud:///1f1028db-7824-4c10-a90a-0aa9ed40d74f"
+                    },
+                    {
+                      "key": "alt_text",
+                      "value": "df",
+                      "type": "text",
+                      "uuid": "deb0c668-67f5-47bc-a202-a6423770bc3e"
+                    },
+                    {
+                      "key": "image_title",
+                      "value": "dfdf",
+                      "type": "text",
+                      "uuid": "b7c7eb16-c58e-4a2e-9fd3-360bed8819a0"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/about",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "about"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Contact Section",
+          "item": [
+            {
+              "name": "get contact section",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"About Our Company\",\r\n  \"description\": \"We are a company that provides CMS solutions and services.\",\r\n  \"image_media_id\": 1\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/contact-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "contact-section"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update contact section",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Contact Us\",\r\n  \"subtitle\": \"We would love to hear \"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/contact-section",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "contact-section"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "contact submition",
+          "item": [
+            {
+              "name": "get contact sumbitions",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Contact Us\",\r\n  \"subtitle\": \"We would love to hear from you\"\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/contact-submissions",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "contact-submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get contact submission by id",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{Admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"title\": \"Contact Us\",\r\n  \"subtitle\": \"We would love to hear from you\"\r\n}\r\n"
+                },
+                "url": {
+                  "raw": "{{url}}/api/admin/contact-submissions/1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "contact-submissions",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "pm.request.headers.add({\r",
+              "    key: 'Accept',\r",
+              "    value: 'application/json'\r",
+              "});\r",
+              "\r",
+              "pm.request.headers.add({\r",
+              "    key: 'Content-Type',\r",
+              "    value: 'application/json'\r",
+              "});"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": ""
+    },
+    {
+      "key": "Admin",
+      "value": ""
+    }
+  ]
+}

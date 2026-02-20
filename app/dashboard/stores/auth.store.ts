@@ -10,18 +10,18 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: typeof window !== "undefined"
-    ? localStorage.getItem("cms_token")
+    ? localStorage.getItem("auth_token")
     : null,
   user: null,
   isAuthenticated: false,
 
   login: (token, user) => {
-    localStorage.setItem("cms_token", token);
+    localStorage.setItem("auth_token", token);
     set({ token, user, isAuthenticated: true });
   },
 
   logout: () => {
-    localStorage.removeItem("cms_token");
+    localStorage.removeItem("auth_token");
     set({ token: null, user: null, isAuthenticated: false });
   },
 }));

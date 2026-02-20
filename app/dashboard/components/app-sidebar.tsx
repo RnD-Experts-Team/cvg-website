@@ -20,7 +20,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/dashboard/components/ui/sidebar";
-import Link from "next/link";
 
 const data = {
   user: {

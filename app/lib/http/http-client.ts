@@ -1,10 +1,6 @@
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
-import { HttpError } from "@/lib/http/errors";
+"use client";
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { HttpError } from "./errors";
 
 export type HttpClientOptions = {
   baseUrl: string;
@@ -22,37 +18,28 @@ export class HttpClient {
       headers: {
         "Content-Type": "application/json",
       },
-      // withCredentials: true, // enable if your CMS uses cookie-based auth
     });
 
-    // Request interceptor: attach token
     this.client.interceptors.request.use((config) => {
       const token = this.opts.getToken?.();
-      if (token) {
+      // Do not add Authorization header for login endpoint
+      const isLogin = config.url?.includes("/api/auth/login");
+      if (token && !isLogin) {
         config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     });
 
-    // Response interceptor: normalize errors
     this.client.interceptors.response.use(
       (res) => res,
       (error: AxiosError) => {
-        // Axios error may not have response (network / CORS / timeout)
         const status = error.response?.status ?? 0;
         const details = error.response?.data ?? {
           message: error.message,
           code: error.code,
         };
-
-        // Best-effort path for debugging (like your fetch version)
-        const path =
-          (error.config?.url ?? "").toString() ||
-          (error.config?.baseURL ?? "").toString() ||
-          "unknown";
-
-        throw new HttpError(`HTTP ${status || "ERR"} for ${path}`, status, details);
+        throw new HttpError(`HTTP ${status || "ERR"} for ${error.config?.url}`, status, details);
       }
     );
   }
@@ -62,12 +49,30 @@ export class HttpClient {
     return res.data;
   }
 
-  get<T>(path: string, config?: AxiosRequestConfig) {
-    return this.request<T>({ ...config, url: path, method: "GET" });
+  login<T = any>(payload: { email: string; password: string }): Promise<T> {
+    return this.post<T>("/auth/login", payload).catch((error: HttpError) => {
+      console.error("Login Error", error);
+      throw error;
+    });
+  }
+    // Updated logout function to ensure proper API interaction
+  logout<T = any>(): Promise<T> {
+    const token = localStorage.getItem("auth_token");
+    return this.post<T>("/auth/logout", {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).catch((error: HttpError) => {
+      console.error("Logout Error", error);
+      throw error;
+    });
   }
 
   post<T>(path: string, payload?: unknown, config?: AxiosRequestConfig) {
     return this.request<T>({ ...config, url: path, method: "POST", data: payload });
+  }
+  get<T>(path: string, config?: AxiosRequestConfig) {
+    return this.request<T>({ ...config, url: path, method: "GET" });
   }
 
   put<T>(path: string, payload?: unknown, config?: AxiosRequestConfig) {

@@ -7,6 +7,8 @@ import { ProjectCategory } from "@/types/projects";
 import { useState, useMemo } from "react";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 
 
 if (typeof window !== "undefined") {

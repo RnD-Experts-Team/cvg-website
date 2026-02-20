@@ -49,7 +49,7 @@ export default function HeroSection({ heroData }: Props) {
 
       {/* Content */}
       <div className="hero-content absolute z-20 flex items-center justify-center w-full h-full text-center text-white px-4">
-        <div className="w-full max-w-[1000px] lg:h-[258px] h-auto px-6 sm:px-8 md:px-12 py-8 md:py-10 rounded-[25px] bg-[rgba(0,0,0,0.55)] backdrop-blur-sm flex flex-col justify-center gap-6 mx-auto min-w-0">
+        <div className="w-full max-w-[1000px] lg:h-[258px] h-auto px-6 sm:px-8 md:px-12 py-8 md:py-10 rounded-[25px] bg-[rgba(0,0,0,0.55)]  flex flex-col justify-center gap-6 mx-auto min-w-0">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">Commercial <span className=" text-[#F68620]">Vision</span> Group</h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white max-w-prose mx-auto">{heroData.subtitle}</p>
           <div className="flex justify-center w-full">

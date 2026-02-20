@@ -13,8 +13,8 @@ export default function FooterContact({ contact }: Props) {
       {items.map((item, index) => (
         <div key={index} className=" flex items-center justify-center gap-6 pb-[31px]">
           <p className=" font-semibold text-[18px] ">{item.text}</p>
-          {item.phone && <p className=" font-semibold text-[18px] ">{item.phone}</p>}
-          {item.email && <p className=" font-semibold text-[18px]">{item.email}</p>}
+          {item.phone && <a className=" font-semibold text-[18px] " href={`tel:${item.phone}`}>{item.phone}</a>}
+          {item.email && <a className=" font-semibold text-[18px] " href={`mailto:${item.email}`}>{item.email}</a>}
         </div>
       ))}
     </div>
