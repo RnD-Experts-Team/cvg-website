@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   BellIcon,
@@ -45,46 +46,36 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const router = useRouter();
+   const router = useRouter();
   const authLogout = useAuthStore((state) => state.logout);
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        // call server to invalidate token
-        const client = new HttpClient({
-          baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://cvg.pnehomes.com/api",
-          getToken: () => token,
-        });
+      setLoading(true);
 
-        const response = await client.logout<{ success: boolean; data?: any; message?: string }>();
+      const token = useAuthStore.getState().token;
 
-        // backend returned a success flag; optionally show message
-        if (response?.success) {
-          // remove token locally
-          localStorage.removeItem("auth_token");
-          toast.success(response.message || "Logged out successfully");
-        } else {
-          console.warn("Logout response did not indicate success", response);
-          toast.warn("Unexpected logout response");
-        }
-      } else {
-        // no token available, just consider user logged out
-        toast.info("No session found, redirecting to login");
-      }
+      const client = new HttpClient({
+        // allow empty string for same-origin API calls; processes will
+        // default to window.location when axios sees an empty baseURL
+        baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "",
+        getToken: () => token,
+      });
+
+      await client.logout();
+
+      toast.success("Logged out successfully");
     } catch (err) {
-      // treat 401 as already logged out/unauthenticated
-      if (err instanceof HttpError && err.status === 401) {
-        toast.info("Session expired, redirecting to login...");
-      } else {
-        console.error("Logout failed", err);
-        toast.error("Logout failed. Please try again.");
-      }
+      console.warn("Logout API failed, continuing cleanup...");
     } finally {
-      // clear client state regardless of server response
+      setLoading(false);
+
+      localStorage.removeItem("auth_token");
+      Cookies.remove("auth_token");
       authLogout();
-      router.push("/login");
+
+      router.replace("/login");
     }
   };
 

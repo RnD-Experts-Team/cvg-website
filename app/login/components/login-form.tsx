@@ -25,8 +25,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
+  // prefer an explicit NEXT_PUBLIC_API_URL, otherwise fall back to a relative path
+  // so that the API call will go against the same origin (e.g. `/api/auth/login`)
+  // which is convenient for local development and avoids CORS issues.
   const client = new HttpClient({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://cvg.pnehomes.com/api", // API base URL (no trailing /api)
+    baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "",
     getToken: () => localStorage.getItem("auth_token"), // Retrieve token from localStorage
   });
 
@@ -69,21 +72,31 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       // Redirect user to the desired page (dashboard or nextPath)
       router.replace(nextPath);
       router.refresh();
-    } catch (error) {
-      // Handle errors by displaying the error message in a toast
+    } catch (error: unknown) {
+      // Display diagnostic information to make debugging easier.  The
+      // original implementation always showed a generic toast which made it
+      // impossible to tell whether the request actually reached the server or
+      // whether the error was e.g. a network/CORS failure.
+      console.error("Login failed:", error);
+
       if (error instanceof HttpError) {
         const serverMsg = error.message || "An unknown error occurred. Please try again.";
         // if credentials are wrong, show specific message
         if (error.status === 400 || error.status === 401) {
-          const msg = "Email or password is error.";
+          const msg = "Email or password is incorrect.";
           setError(msg);
           toast.error(msg);
         } else {
           setError(serverMsg);
-          toast.error("Login failed! Please check your credentials.");
+          toast.error(`Login failed (${error.status}): ${serverMsg}`);
         }
+      } else if ((error as any)?.isAxiosError) {
+        // network / CORS / other axios-specific problems
+        const ax = error as any;
+        toast.error(`Network error: ${ax.message}`);
+      } else {
+        toast.error("Login failed! Please check your credentials.");
       }
-      console.error("Login failed:", error);
     } finally {
       setIsSubmitting(false); // Stop the loading state
     }

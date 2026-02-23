@@ -1,41 +1,25 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Middleware for authentication guard and redirection logic.
-// Ensures dashboard pages require a valid token cookie and prevents
-// logged-in users from visiting /login again.
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
   const token = req.cookies.get("auth_token")?.value;
+  const { pathname } = req.nextUrl;
 
-  // 1. protect dashboard routes
+  // Protect dashboard
   if (pathname.startsWith("/dashboard")) {
     if (!token) {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = "/login";
-      loginUrl.searchParams.set("next", pathname);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL("/login", req.url));
     }
-    // token exists -> allow access
-    return NextResponse.next();
   }
 
-  // 2. if the user is already authenticated and tries to hit login page,
-  //    send them to dashboard instead (avoid seeing login again)
+  // Prevent authenticated users from visiting login
   if (pathname === "/login" && token) {
-    const dashUrl = req.nextUrl.clone();
-    dashUrl.pathname = "/dashboard";
-    return NextResponse.redirect(dashUrl);
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  // otherwise just continue
   return NextResponse.next();
 }
 
-// specify the paths the middleware should run on
 export const config = {
-  matcher: [
-    ,
-    "/login",
-  ],
+  matcher: ["/login", "/dashboard/:path*"],
 };

@@ -6,7 +6,10 @@ import {
   FileIcon,
   SettingsIcon,
   HelpCircleIcon,
-  SearchIcon,
+  Footprints,
+  InspectionPanelIcon,
+  CaptionsIcon,
+  FolderKanbanIcon,
 } from "lucide-react";
 import { NavMain } from "@/app/dashboard/components/nav-main";
 import { NavSecondary } from "@/app/dashboard/components/nav-secondary";
@@ -34,18 +37,32 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Blank Page",
-      url: "/dashboard/blank",
-      icon: FileIcon,
+      title: "Site Metadata",
+      url: "/dashboard/site-metadata",
+      icon: InspectionPanelIcon,
+    },
+    {
+      title: "Footer",
+      url: "/dashboard/footer",
+      icon: Footprints,
+    },
+    {
+      title: "Hero",
+      url: "/dashboard/hero",
+      icon: CaptionsIcon,
+    },
+    {
+      title: "Projects",
+      url: "/dashboard/projects",
+      icon: FolderKanbanIcon,
     },
   ],
   navSecondary: [
     {
       title: "Settings",
-      url: "/dashboard/setting",
+      url: "/dashboard/settings",
       icon: SettingsIcon,
     },
-    
   ],
 };
 
@@ -56,9 +73,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
+              <a href="http://localhost:3000/">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">CVG-Dashboard</span>
+                <span className="text-base font-semibold">CVG-Website</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
