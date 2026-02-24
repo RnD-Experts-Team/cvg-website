@@ -58,8 +58,8 @@ export const ProjectsService = {
     },
 
     updateCategory(id: number, payload: FormData) {
-    return http.post<ApiResponse<Category>>(
-        `/admin/categories/${id}?_method=PUT`,
+    return http.put<ApiResponse<Category>>(
+        `/admin/categories/${id}`,
         payload
     );
     },

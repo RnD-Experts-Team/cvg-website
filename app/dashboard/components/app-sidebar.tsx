@@ -10,6 +10,11 @@ import {
   InspectionPanelIcon,
   CaptionsIcon,
   FolderKanbanIcon,
+  ChartCandlestickIcon,
+  ToolboxIcon,
+  CpuIcon,
+  Info,
+  UserCircleIcon,
 } from "lucide-react";
 import { NavMain } from "@/app/dashboard/components/nav-main";
 import { NavSecondary } from "@/app/dashboard/components/nav-secondary";
@@ -55,6 +60,31 @@ const data = {
       title: "Projects",
       url: "/dashboard/projects",
       icon: FolderKanbanIcon,
+    },
+    {
+      title: "Services",
+      url: "/dashboard/services",
+      icon: ToolboxIcon,
+    },
+    {
+      title: "Values",
+      url: "/dashboard/values",
+      icon: ChartCandlestickIcon,
+    },
+    {
+      title: "Process",
+      url: "/dashboard/process",
+      icon: CpuIcon,
+    },
+    {
+      title: "About",
+      url: "/dashboard/about",
+      icon: Info ,
+    },
+    {
+      title: "Contact",
+      url: "/dashboard/contact",
+      icon: UserCircleIcon ,
     },
   ],
   navSecondary: [

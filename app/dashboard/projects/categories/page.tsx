@@ -73,7 +73,7 @@ export default function CategoriesPage() {
 
           <Button
             onClick={() =>
-              router.push("/dashboard/projects/createcategory")
+              router.push("/dashboard/projects/categories/create")
             }
           >
             Create Category
