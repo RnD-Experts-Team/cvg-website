@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import { HeroData, HeroVideo } from "./hero.types";
 import gsap from "gsap";
+import { HomePageData } from "@/app/lib/types/cms/home";
 
 interface Props {
-  heroData: HeroData;
+  heroData: HomePageData["data"]["hero"];  // Adjusted type to match CMS data structure
 }
 
 export default function HeroSection({ heroData }: Props) {
@@ -11,10 +11,16 @@ export default function HeroSection({ heroData }: Props) {
   const hasAnimated = useRef(false);  // Reference to track if the animation has run
 
   useEffect(() => {
-    // If background is a video, show it
-    if ("src" in heroData.background) {
-      setIsVideoBackground(true);
-    }
+    // Defensive: ensure media entry exists before checking properties
+    const mediaEntry = heroData?.media?.[0]?.media;
+    if (!mediaEntry || typeof mediaEntry !== "object") return;
+
+    const isVideo =
+      mediaEntry.type === "video" ||
+      (typeof mediaEntry.mime_type === "string" && mediaEntry.mime_type.startsWith("video")) ||
+      (typeof mediaEntry === "object" && Object.prototype.hasOwnProperty.call(mediaEntry, "src"));
+
+    setIsVideoBackground(Boolean(isVideo));
   }, [heroData]);
 
   // GSAP for animating content
@@ -38,7 +44,7 @@ export default function HeroSection({ heroData }: Props) {
       <div className="absolute top-0 left-0 w-full h-full">
         {isVideoBackground && (
           <video
-            src={(heroData.background as HeroVideo).src}
+            src={heroData?.media?.[0]?.media?.url ?? ""}
             autoPlay
             loop
             muted
@@ -54,11 +60,11 @@ export default function HeroSection({ heroData }: Props) {
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white max-w-prose mx-auto">{heroData.subtitle}</p>
           <div className="flex justify-center w-full">
             <a
-              href={heroData.contactLink}
-              aria-label={heroData.contactLabel}
+              href='#contact'
+              aria-label={heroData.button_text}
               className="bg-[#F68620] text-white text-sm sm:text-base md:text-lg py-2.5 sm:py-3 px-6 sm:px-8 rounded-[10px] hover:bg-orange-600 transition-all w-full sm:w-auto text-center"
             >
-              {heroData.contactLabel}
+              {heroData.button_text}
             </a>
           </div>
         </div>
