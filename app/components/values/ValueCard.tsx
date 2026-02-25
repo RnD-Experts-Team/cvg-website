@@ -15,7 +15,7 @@ const ValueCard: React.FC<ValueCardProps> = ({ image, title, description }) => {
       {!image && (
         <IoMdMusicalNote
           size={51}
-          className="text-[#F8F8F8] mx-auto mb-[16px]"
+          className="text-[#1E1E1E] mx-auto mb-[16px]"
         />
       )}
 

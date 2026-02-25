@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
-import { HeroData } from "./hero.types";
+import { HomePageData } from "@/app/lib/types/cms/home";
 
 const HeroSection = dynamic(() => import("./HeroSection"), {
   ssr: false,
@@ -12,7 +12,7 @@ const HeroSection = dynamic(() => import("./HeroSection"), {
 });
 
 interface Props {
-  heroData: HeroData;
+  heroData: HomePageData["data"]["hero"];  // Adjusted type to match CMS data structure
 }
 
 export default function HeroClient({ heroData }: Props) {

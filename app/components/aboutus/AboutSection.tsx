@@ -2,8 +2,13 @@
 
 import React from "react";
 import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
+import type { AboutSection, HomePageData  } from "@/app/lib/types/cms/home";
 
-const AboutSection: React.FC = () => {
+type Props = {
+  about?: HomePageData["data"]["about_section"] | null;
+};
+
+const AboutSection: React.FC<Props> = ({ about }: Props) => {
   const textRef = useScrollAnimation<HTMLDivElement>({
     from: { autoAlpha: 0, x: -60 },
     duration: 0.9,
@@ -25,7 +30,7 @@ const AboutSection: React.FC = () => {
     >
       <div className="max-w-[1440px] mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#1E1E1E]">About Us</h2>
+          <h2 className="text-4xl font-bold text-[#1E1E1E]">{about?.title}</h2>
         </div>
 
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16">
@@ -34,19 +39,15 @@ const AboutSection: React.FC = () => {
             ref={textRef}
             className="w-full md:w-1/2 text-[#1E1E1E] text-[16px] md:text-[20px] text-center  leading-[1.6] font-medium"
           >
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Nulla posuere
-              purus et eros placerat, vel efficitur metus suscipit.
-            </p>
+            <p>{about?.description}</p>
           </div>
 
           {/* Image */}
           <div ref={imageRef} className="w-full md:w-1/2 flex justify-center">
             <img
-              src="/img/proCard2.png"
-              alt="About Us"
+              src={about?.image?.url ?? ""}
+              alt={about?.image?.alt_text ?? "About Image"}
+              title={about?.image?.title ?? undefined}
               className="w-full max-w-[680px] min-h-[338px] lg:h-[338px] rounded-lg shadow-lg object-cover opacity-100"
             />
           </div>

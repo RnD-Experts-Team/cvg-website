@@ -5,10 +5,13 @@ import ProcessSection from "../components/process/ProcessSection";
 import ProjectsSection from "../components/ProjectSections/ProjectsSection";
 import ServicesSection from "../components/ServicesSections/ServicesSection";
 import ValuesSection from "../components/values/ValuesSection";
-import { getHeroData } from "../lib/hero.service";
+import { getHeroOnly, getAboutSection, getProcessSection, getContactSection } from "../lib/api/home";
 
 export default async function Home() {
-  const heroData = await getHeroData();
+  const heroData = await getHeroOnly(); // Fetch only hero data for the client component
+  const about = await getAboutSection();
+  const process = await getProcessSection();
+  const contact = await getContactSection();
   return (
     <div>
       {/* HeroSection is a client component; render via client wrapper */}
@@ -16,16 +19,16 @@ export default async function Home() {
       <ProjectsSection />
       <ServicesSection />
       <div id="value">
-        <ValuesSection  title="Our Values" />
+        <ValuesSection  />
       </div>
       <div id="process">
-        <ProcessSection />
+        <ProcessSection process={process ?? null} />
       </div>
       <div id="about">
-        <AboutSection />
+        <AboutSection about={about ?? null} />
       </div>
       <div id="contact">
-        <ContactForm />
+        <ContactForm contact={contact ?? null} />
       </div>
     </div>
   );

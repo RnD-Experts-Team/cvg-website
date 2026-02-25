@@ -116,7 +116,8 @@ const ServicesSection: React.FC = () => {
             <button
               onClick={toggleShowMore}
               aria-expanded={showMore}
-              className="bg-[#1E1E1E] border border-primary text-offwhite px-6 py-3 rounded-[10px] flex items-center gap-2 hover:bg-gray-800 transition-colors"
+              suppressHydrationWarning
+              className="bg-[#1E1E1E] border border-primary text-white px-6 py-3 rounded-[10px] flex items-center gap-2 hover:bg-gray-800 transition-colors"
             >
               <span>{showMore ? "Show Less" : "Show More"}</span>
 

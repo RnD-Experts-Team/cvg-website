@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { HeroImage } from "./hero.types";
+
+interface SlideImage {
+  id?: string | number;
+  src: string;
+  alt?: string;
+}
 
 interface Props {
-  images: HeroImage[];
+  images: SlideImage[];
 }
 
 export default function HeroSlider({ images }: Props) {
@@ -22,7 +27,7 @@ export default function HeroSlider({ images }: Props) {
     <div className="w-full h-full">
       <div
         style={{
-          backgroundImage: `url(${images[currentImage].src})`,
+          backgroundImage: `url(${images[currentImage]?.src ?? ''})`,
         }}
         className="w-full h-full bg-cover bg-center transition-all duration-1000"
       />

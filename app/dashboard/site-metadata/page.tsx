@@ -176,55 +176,7 @@ export default function SiteMetadataPage() {
 
           <Separator />
 
-          {/* Favicon */}
-          {/* Favicon */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Favicon</h3>
-
-            <img
-              src={
-                faviconFile
-                  ? URL.createObjectURL(faviconFile) // 🔥 preview selected file
-                  : data.favicon?.url || "/placeholder.png"
-              }
-              alt={data.favicon?.alt_text || "Favicon"}
-              className="h-10 object-contain border rounded p-2"
-            />
-
-            <Input
-              type="file"
-              accept="image/*,.ico"
-              onChange={(e) => setFaviconFile(e.target.files?.[0] || null)}
-            />
-
-            <Input
-              placeholder="Favicon Alt Text"
-              value={data.favicon?.alt_text || ""}
-              onChange={(e) =>
-                setData({
-                  ...data,
-                  favicon: {
-                    ...(data.favicon || {}),
-                    alt_text: e.target.value,
-                  } as any,
-                })
-              }
-            />
-
-            <Input
-              placeholder="Favicon Title"
-              value={data.favicon?.title || ""}
-              onChange={(e) =>
-                setData({
-                  ...data,
-                  favicon: {
-                    ...(data.favicon || {}),
-                    title: e.target.value,
-                  } as any,
-                })
-              }
-            />
-          </div>
+          
 
           <Separator />
 
