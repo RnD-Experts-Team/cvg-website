@@ -8,6 +8,7 @@ import { Input } from "@/app/dashboard/components/ui/input";
 import { Label } from "@/app/dashboard/components/ui/label";
 import { Textarea } from "@/app/dashboard/components/ui/textarea";
 import { Button } from "@/app/dashboard/components/ui/button";
+import { Skeleton } from "@/app/dashboard/components/ui/skeleton";
 import { Category } from "../../../projects"; // Make sure the type is imported
 
 export default function EditCategoryPage() {
@@ -67,7 +68,21 @@ export default function EditCategoryPage() {
     <div className="p-6 space-y-6">
       <h1>Edit Category</h1>
       {loading ? (
-        <p>Loading...</p>
+        <div className="space-y-4 max-w-xl">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40 mb-2" />
+            <Skeleton className="h-10 w-full rounded" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40 mb-2" />
+            <Skeleton className="h-24 w-full rounded" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-28 mb-2" />
+            <Skeleton className="h-10 w-1/2 rounded" />
+          </div>
+          <Skeleton className="h-10 w-40" />
+        </div>
       ) : (
         <div className="space-y-4 max-w-xl">
           <div className="space-y-2">

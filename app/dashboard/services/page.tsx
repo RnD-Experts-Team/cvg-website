@@ -11,6 +11,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Label } from "../components/ui/label";
+import { Skeleton } from "../components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
 
@@ -18,6 +19,7 @@ export default function ServicesPage() {
   const router = useRouter();
 
   const [serviceSection, setServiceSection] = useState<ServiceSectionData | null>(null);
+  const [sectionLoading, setSectionLoading] = useState<boolean>(true);
   const [serviceTitle, setServiceTitle] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [serviceSaving, setServiceSaving] = useState(false);
@@ -36,6 +38,7 @@ export default function ServicesPage() {
   }, []);
 
   async function fetchServiceSection() {
+    setSectionLoading(true);
     try {
       const serviceService = new ServiceService();
       const res = await serviceService.getServiceSection();
@@ -44,6 +47,8 @@ export default function ServicesPage() {
       setServiceDescription(res.data.description || "");
     } catch (err: any) {
       toast.error(err?.message || "Failed to load service section");
+    } finally {
+      setSectionLoading(false);
     }
   }
 
@@ -109,7 +114,14 @@ export default function ServicesPage() {
         </CardHeader>
 
         <CardContent>
-          {serviceSection ? (
+          {sectionLoading ? (
+            <div className="space-y-4 max-w-xl">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-10 w-1/3" />
+            </div>
+          ) : serviceSection ? (
             <div className="space-y-4 max-w-xl">
               <div className="space-y-2">
                 <Label>Service Title</Label>
@@ -166,7 +178,30 @@ export default function ServicesPage() {
 
         <CardContent>
           {loading ? (
-            <p>Loading services...</p>
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left">Title</th>
+                    <th className="px-4 py-2 text-left">Description</th>
+                    <th className="px-4 py-2 text-left">Image</th>
+                    <th className="px-4 py-2 text-left">Slug</th>
+                    <th className="px-4 py-2 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="px-4 py-2"><Skeleton className="h-4 w-40" /></td>
+                      <td className="px-4 py-2"><Skeleton className="h-4 w-56" /></td>
+                      <td className="px-4 py-2"><Skeleton className="h-12 w-12 rounded" /></td>
+                      <td className="px-4 py-2"><Skeleton className="h-4 w-24" /></td>
+                      <td className="text-center"><Skeleton className="h-8 w-20 mx-auto" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full table-auto">

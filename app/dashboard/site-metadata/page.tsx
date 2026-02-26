@@ -15,6 +15,7 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Separator } from "../components/ui/separator";
 import { Button } from "../components/ui/button";
+import { Skeleton } from "../components/ui/skeleton";
 
 export default function SiteMetadataPage() {
   const [loading, setLoading] = useState(true);
@@ -72,7 +73,44 @@ export default function SiteMetadataPage() {
   }
 
   if (loading || !data) {
-    return <div className="p-6">Loading site metadata...</div>;
+    return (
+      <div className="p-6 max-w-full space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Skeleton className="h-6 w-48" />
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-1/3" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-10 w-1/4" />
+            </div>
+            <Separator />
+
+            <div className="space-y-4">
+              <Skeleton className="h-5 w-32" />
+              <div className="flex items-center gap-4 mt-2">
+                <Skeleton className="h-20 w-20 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-1/2" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <Skeleton className="h-12 w-full rounded-md" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -126,7 +164,7 @@ export default function SiteMetadataPage() {
 
           {/* Logo */}
           {/* Logo */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h3 className="font-semibold">Logo</h3>
 
             <img
@@ -172,9 +210,9 @@ export default function SiteMetadataPage() {
                 })
               }
             />
-          </div>
+          </div> */}
 
-          <Separator />
+          {/* <Separator /> */}
 
           
 

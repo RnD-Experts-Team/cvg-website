@@ -16,6 +16,7 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
+import { Skeleton } from "../components/ui/skeleton";
 
 const MAX_VIDEO_SIZE_MB = 50;
 
@@ -100,7 +101,77 @@ export default function HeroPage() {
   }
 
   if (loading || !data) {
-    return <div className="p-6">Loading hero section...</div>;
+    return (
+      <div className="p-6 max-w-full space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Skeleton className="h-6 w-40" />
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Skeleton className="h-5 w-24 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+              </div>
+
+              <div>
+                <Skeleton className="h-5 w-28 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Skeleton className="h-5 w-28 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+                <div>
+                  <Skeleton className="h-5 w-28 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">
+                <Skeleton className="h-5 w-40" />
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="border rounded p-2">
+                    <Skeleton className="h-40 w-full rounded object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">
+                <Skeleton className="h-5 w-64" />
+              </h3>
+
+              <Skeleton className="h-12 w-full" />
+
+              <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-40 w-full rounded" />
+                <Skeleton className="h-40 w-full rounded" />
+              </div>
+            </div>
+
+            <Separator />
+
+            <Skeleton className="h-12 w-full rounded-md" />
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

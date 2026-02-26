@@ -9,21 +9,26 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
+import { Skeleton } from "../components/ui/skeleton";
 
 export default function AboutPage() {
   const [aboutSection, setAboutSection] = useState<AboutSection | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch about section data on page load
   useEffect(() => {
     const fetchAboutSection = async () => {
+      setLoading(true);
       try {
         const res = await getAboutSection();
         const payload = res && typeof res === 'object' && 'data' in res ? (res as any).data : res;
         setAboutSection(payload ?? null);
       } catch (err) {
         toast.error("Failed to fetch About section data.");
+      }
+      finally {
+        setLoading(false);
       }
     };
     fetchAboutSection();
@@ -131,7 +136,39 @@ export default function AboutPage() {
           </Button>
         </div>
       ) : (
-        <p>Loading...</p>
+        (loading && !aboutSection) ? (
+          <div className="p-8 max-w-full space-y-6">
+            <h1 className="text-3xl font-bold mb-6">
+              <Skeleton className="h-8 w-72" />
+            </h1>
+
+            <div className="space-y-4">
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+              </div>
+
+              <div>
+                <Skeleton className="h-4 w-32 mb-2" />
+                <Skeleton className="h-24 w-full rounded" />
+              </div>
+
+              <div>
+                <Skeleton className="h-4 w-20 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+                <div className="mt-4">
+                  <Skeleton className="h-40 w-56 rounded" />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Skeleton className="h-10 w-40 rounded" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )
       )}
     </div>
   );

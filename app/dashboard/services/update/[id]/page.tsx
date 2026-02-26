@@ -9,6 +9,7 @@ import { Input } from '@/app/dashboard/components/ui/input';
 import { Textarea } from '@/app/dashboard/components/ui/textarea';
 import { Button } from '@/app/dashboard/components/ui/button';
 import { Label } from '@/app/dashboard/components/ui/label';
+import { Skeleton } from '@/app/dashboard/components/ui/skeleton';
 
 const UpdateServicePage = () => {
   const [service, setService] = useState<Service | null>(null);
@@ -79,7 +80,49 @@ const UpdateServicePage = () => {
     }
   };
 
-  if (!service) return <div>Loading...</div>;
+  if (!service)
+    return (
+      <div className="space-y-6 p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Skeleton className="h-6 w-48" />
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="space-y-4 max-w-full">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-36 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+              </div>
+
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-28 mb-2" />
+                <Skeleton className="h-24 w-full rounded" />
+              </div>
+
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-20 mb-2" />
+                <Skeleton className="h-10 w-full rounded" />
+              </div>
+
+              <div className="space-y-2 flex items-center gap-4">
+                <Skeleton className="h-32 w-32 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+              </div>
+
+              <div>
+                <Skeleton className="h-10 w-40" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
 
   return (
     <div className="space-y-6 p-6">

@@ -8,16 +8,19 @@ import { ProcessSection, Step } from "./types";
 import { getProcessSection, updateProcessSection } from "./process.service";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { Skeleton } from "../components/ui/skeleton";
 
 export default function ProcessPage() {
   const [processSection, setProcessSection] = useState<ProcessSection | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [newStep, setNewStep] = useState<Step>({ id: 0, process_section_id: 1, sort_order: 1, title: '', description: '', created_at: '', updated_at: '' });
   const [steps, setSteps] = useState<Step[]>([]);
 
   useEffect(() => {
     const fetchProcessSection = async () => {
+      setLoading(true);
       try {
         const res = await getProcessSection();
         // support both ApiResponse<T> and raw T returns
@@ -26,6 +29,8 @@ export default function ProcessPage() {
         setSteps((payload && payload.steps) || []);
       } catch (err) {
         console.error("Failed to fetch process section:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -133,66 +138,103 @@ export default function ProcessPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl mb-4">Edit Process Section</h1>
+      <h1 className="text-2xl mb-4"> Process Section</h1>
 
-      <div className="mb-6">
-        <label htmlFor="title" className="block text-sm">Title</label>
-        <Input
-          id="title"
-          value={processSection?.title || ""}
-          onChange={(e) => setProcessSection((prev) => prev ? { ...prev, title: e.target.value } : prev)}
-          className="w-full"
-        />
-      </div>
+      {loading && !processSection ? (
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-64" />
 
-      <div className="mb-6">
-        <label htmlFor="image" className="block text-sm">Image</label>
-        <Input type="file" onChange={handleImageChange} className="w-full" />
-        {processSection?.image && (
-          <img src={processSection.image.url} alt={processSection.image.alt_text} className="w-32 mt-4" />
-        )}
-      </div>
+          <div className="mb-6">
+            <Skeleton className="h-5 w-36 mb-2" />
+            <Skeleton className="h-10 w-full rounded" />
+          </div>
 
-      <div className="mb-6">
-        <h2 className="text-xl">Steps</h2>
-        <div className="mt-4">
-          {steps.map((step, index) => (
-            <div key={index} className="border p-4 mb-4">
-              <div className="mb-2">
-                <label className="block text-sm">Step Title</label>
-                <Input
-                  value={step.title}
-                  onChange={(e) => updateStep(index, 'title', e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block text-sm">Step Description</label>
-                <Input
-                  value={step.description}
-                  onChange={(e) => updateStep(index, 'description', e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block text-sm">Sort Order</label>
-                <Input
-                  type="number"
-                  value={step.sort_order}
-                  onChange={(e) => updateStep(index, 'sort_order', e.target.value)}
-                  className="w-full"
-                />
-              </div>
+          <div className="mb-6">
+            <Skeleton className="h-5 w-36 mb-2" />
+            <div className="flex items-start gap-4">
+              <Skeleton className="h-32 w-32 rounded" />
+              <Skeleton className="h-10 w-full rounded" />
             </div>
-          ))}
+          </div>
 
-          <Button onClick={addStep} className="mt-4">Add Step</Button>
+          <div className="mb-6">
+            <Skeleton className="h-6 w-24 mb-3" />
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <div key={idx} className="border p-4 mb-4">
+                <Skeleton className="h-5 w-40 mb-2" />
+                <Skeleton className="h-10 w-full mb-2" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            ))}
+            <div className="mt-2">
+              <Skeleton className="h-10 w-40" />
+            </div>
+          </div>
+
+          <Skeleton className="h-10 w-36" />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="mb-6">
+            <label htmlFor="title" className="block text-sm">Title</label>
+            <Input
+              id="title"
+              value={processSection?.title || ""}
+              onChange={(e) => setProcessSection((prev) => prev ? { ...prev, title: e.target.value } : prev)}
+              className="w-full"
+            />
+          </div>
 
-      <Button onClick={handleSaveProcess} className="mt-6">
-        {saving ? "Saving..." : "Save Process"}
-      </Button>
+          <div className="mb-6">
+            <label htmlFor="image" className="block text-sm">Image</label>
+            <Input type="file" onChange={handleImageChange} className="w-full" />
+            {processSection?.image && (
+              <img src={processSection.image.url} alt={processSection.image.alt_text} className="w-32 mt-4" />
+            )}
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl">Steps</h2>
+            <div className="mt-4">
+              {steps.map((step, index) => (
+                <div key={index} className="border p-4 mb-4">
+                  <div className="mb-2">
+                    <label className="block text-sm">Step Title</label>
+                    <Input
+                      value={step.title}
+                      onChange={(e) => updateStep(index, 'title', e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-sm">Step Description</label>
+                    <Input
+                      value={step.description}
+                      onChange={(e) => updateStep(index, 'description', e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-sm">Sort Order</label>
+                    <Input
+                      type="number"
+                      value={step.sort_order}
+                      onChange={(e) => updateStep(index, 'sort_order', e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <Button onClick={addStep} className="mt-4">Add Step</Button>
+            </div>
+          </div>
+
+          <Button onClick={handleSaveProcess} className="mt-6">
+            {saving ? "Saving..." : "Save Process"}
+          </Button>
+        </>
+      )}
     </div>
   );
 }

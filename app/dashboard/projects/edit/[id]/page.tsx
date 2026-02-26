@@ -12,6 +12,7 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
+import { Skeleton } from "../../../components/ui/skeleton";
 
 import {
   Select,
@@ -120,7 +121,51 @@ export default function EditProjectPage() {
   }
 
   if (loading || !project) {
-    return <div className="p-6">Loading project...</div>;
+    return (
+      <div className="p-6 max-w-full">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Skeleton className="h-6 w-48" />
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div>
+              <Skeleton className="h-5 w-36 mb-2" />
+              <Skeleton className="h-10 w-full rounded" />
+            </div>
+
+            <div>
+              <Skeleton className="h-5 w-40 mb-2" />
+              <Skeleton className="h-24 w-full rounded" />
+            </div>
+
+            <div>
+              <Skeleton className="h-5 w-28 mb-2" />
+              <Skeleton className="h-24 w-full rounded" />
+            </div>
+
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-28 mb-2" />
+              <Skeleton className="h-10 w-1/2" />
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-24 w-24 rounded" />
+              <div className="flex-1">
+                <Skeleton className="h-4 w-1/2 mb-2" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            </div>
+
+            <div>
+              <Skeleton className="h-10 w-40" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

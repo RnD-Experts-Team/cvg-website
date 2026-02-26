@@ -6,18 +6,36 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaChevronDown } from "react-icons/fa6";
 
 import ServiceCard from "./ServiceCard";
-import { services } from "./ServiceData";
+import { ServiceItem, MediaItem } from "@/app/lib/types/cms/home";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const ServicesSection: React.FC = () => {
+interface ServicesSectionProps {
+  section?: {
+    id: number;
+    title?: string | null;
+    description?: string | null;
+    content?: string | null;
+    image_media_id?: number | null;
+    button_text?: string | null;
+    created_at?: string;
+    updated_at?: string;
+    image?: MediaItem | null;
+  } | null;
+  services?: ServiceItem[];
+}
+
+const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSection, services: initialServices }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasScrollTriggered = useRef(false);
 
   const [showMore, setShowMore] = useState(false);
+  const [section, setSection] = useState<any>(initialSection ?? null);
+  const [services, setServices] = useState<any[]>(initialServices ?? []);
 
+  // default show 4 services in the grid; toggle shows the rest
   const visibleServices = showMore ? services : services.slice(0, 4);
 
   const toggleShowMore = () => {
@@ -49,6 +67,15 @@ const ServicesSection: React.FC = () => {
     });
   }, []);
 
+  // If props change after hydration, update state
+  useEffect(() => {
+    setSection(initialSection ?? null);
+  }, [initialSection]);
+
+  useEffect(() => {
+    setServices(initialServices ?? []);
+  }, [initialServices]);
+
   // Animate newly revealed cards when "Show More" is toggled
   useEffect(() => {
     if (!hasScrollTriggered.current) return;
@@ -77,7 +104,7 @@ const ServicesSection: React.FC = () => {
     <section id="services" className="relative py-20">
       {/* Background Image */}
       <img
-        src="/img/bgService.png"
+        src={section?.image?.url ?? '/img/bgService.png'}
         alt="Services background"
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -89,11 +116,10 @@ const ServicesSection: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#1E1E1E] mb-4">
-            Our Services
+            {section?.title ?? 'Our Services'}
           </h2>
           <p className="text-[#1E1E1E] max-w-3xl mx-auto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            {section?.description ?? 'We offer a range of services to support your needs.'}
           </p>
         </div>
 
@@ -103,10 +129,7 @@ const ServicesSection: React.FC = () => {
           className="gap-[16px] flex justify-center items-start flex-wrap"
         >
           {visibleServices.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-            />
+            <ServiceCard key={service.id} service={service} />
           ))}
         </div>
 
