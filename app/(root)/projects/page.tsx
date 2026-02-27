@@ -15,12 +15,14 @@ if (typeof window !== "undefined") {
 
 import { getProjectsList, getCategories, getProjectsSection } from "@/app/lib/api/home";
 import type { ProjectItem, CategoryItem } from "@/app/lib/types/cms/home";
+import { Skeleton } from "@/app/dashboard/components/ui/skeleton";
 
 // categories and descriptions will come from API; start empty and populate on mount
 // categories: list of category titles
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [categoriesList, setCategoriesList] = useState<CategoryItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
 
@@ -90,6 +92,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     Promise.all([getProjectsList(), getCategories(), getProjectsSection()])
       .then(([projList, cats, sectionPayload]) => {
         if (!mounted) return;
@@ -104,7 +107,10 @@ export default function ProjectsPage() {
           setHeaderDescription(sectionPayload.projects_section.projects_section.description ?? headerDescription);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
     return () => {
       mounted = false;
     };
@@ -205,7 +211,17 @@ export default function ProjectsPage() {
 
         {/* Grid */}
         <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 md:gap-8 items-stretch">
-          {filteredProjects.length === 0 ? (
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="w-full flex justify-center">
+                <div className="project-card w-full max-w-sm bg-white rounded-lg shadow p-4">
+                  <Skeleton className="h-40 w-full mb-4 rounded-lg" />
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))
+          ) : filteredProjects.length === 0 ? (
             <div className="col-span-full text-center py-12 text-gray-500">
               No projects found for <strong>{activeCategory}</strong>.
             </div>

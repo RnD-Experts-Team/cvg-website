@@ -1,16 +1,17 @@
 import ServicesClient from "./ServicesClient";
-import { getServicesSectionFromHome, getServicesListFromApi } from "../../lib/api/home";
+import { getServicesSectionFromHome, getServicesPage } from "../../lib/api/home";
 
 export default async function ServicesPage() {
   const servicesSection = await getServicesSectionFromHome();
-  const servicesList = await getServicesListFromApi();
+  const servicesPage = await getServicesPage(1);
+  const servicesList = servicesPage?.data ?? servicesPage ?? [];
   const title = servicesSection?.services_section?.title  ?? 'Our Services';
 
   return (
     <ServicesClient
       initialServices={servicesList}
       initialTitle={title}
-      
+      initialPagination={servicesPage}
     />
   );
 }

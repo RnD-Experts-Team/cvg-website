@@ -10,11 +10,13 @@ import type { ProjectItem } from "@/app/lib/types/cms/home";
 const ProjectsSection: React.FC = () => {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [sectionTitle, setSectionTitle] = useState<string>("Our Projects");
   const [sectionDescription, setSectionDescription] = useState<string>("Discover our latest commercial design solutions across pizza stores, retail shops, cafes, and restaurants.");
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     Promise.all([getProjectsList(), getProjectsSection()])
       .then(([list, sectionPayload]) => {
         if (!mounted) return;
@@ -36,7 +38,10 @@ const ProjectsSection: React.FC = () => {
           setSectionDescription(sectionPayload.projects_section.projects_section.description ?? sectionDescription);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
     return () => {
       mounted = false;
     };
@@ -66,9 +71,19 @@ const ProjectsSection: React.FC = () => {
         </div>
 
         <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} className="project-card" />
-          ))}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="w-full max-w-sm project-card">
+                  <div className="animate-pulse">
+                    <div className="h-48 bg-gray-300 rounded-lg mb-4" />
+                    <div className="h-4 bg-gray-300 rounded w-5/6 mb-2" />
+                    <div className="h-4 bg-gray-300 rounded w-3/4" />
+                  </div>
+                </div>
+              ))
+            : featuredProjects.map((project) => (
+                <ProjectCard key={project.id} project={project} className="project-card" />
+              ))}
         </div>
       </div>
     </section>

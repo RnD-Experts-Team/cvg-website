@@ -75,6 +75,7 @@ export interface ValueItem {
   values_section_id?: number;
   title?: string | null;
   description?: string | null;
+  media?: MediaItem | null;
   media_id?: number | null;
   sort_order?: number;
   created_at?: string;

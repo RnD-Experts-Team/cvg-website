@@ -19,17 +19,26 @@ const ProjectDetail: React.FC = () => {
   const descRef = useRef<HTMLDivElement>(null);
 
   const [project, setProject] = useState<ProjectItem | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let mounted = true;
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     getProjectsList()
       .then((list) => {
         if (!mounted) return;
         const found = list.find((p) => p.id === Number(id));
         setProject(found);
+        setLoading(false);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
     return () => {
       mounted = false;
     };
@@ -57,20 +66,32 @@ const ProjectDetail: React.FC = () => {
     return () => ctx.revert();
   }, [project]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8]">
+        <div className="max-w-3xl w-full px-6">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto" />
+            <div className="h-64 bg-gray-200 rounded" />
+            <div className="space-y-2 mt-4">
+              <div className="h-4 bg-gray-200 rounded w-5/6" />
+              <div className="h-4 bg-gray-200 rounded w-4/6" />
+              <div className="h-4 bg-gray-200 rounded w-3/6" />
+            </div>
+          </div>
+          <p className="sr-only">Loading project details</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!project) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8]">
         <div className="text-center px-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Project not found
-          </h2>
-          <p className="mb-6 text-gray-600">
-            The project you're looking for does not exist.
-          </p>
-          <Link
-            href="/projects"
-            className="text-orange-500 underline"
-          >
+          <h2 className="text-2xl font-semibold mb-4">Project not found</h2>
+          <p className="mb-6 text-gray-600">The project you're looking for does not exist.</p>
+          <Link href="/projects" className="text-orange-500 underline">
             Back to Projects
           </Link>
         </div>

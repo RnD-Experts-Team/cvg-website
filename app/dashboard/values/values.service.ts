@@ -31,11 +31,11 @@ export interface ValueItem {
   id: number;
   title: string;
   description: string;
-  media: {
-    url: string;
-    alt_text: string;
-    title: string;
-  };
+  media?: {
+    url?: string;
+    alt_text?: string;
+    title?: string;
+  } | null;
   sort_order: number;
 }
 

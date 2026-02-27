@@ -124,6 +124,10 @@ export default function ProcessPage() {
     setNewStep({ ...newStep, title: '', description: '' });
   };
 
+  const removeStep = (index: number) => {
+    setSteps((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const updateStep = (index: number, key: keyof Step, value: string) => {
     const updatedSteps = [...steps];
     // Convert numeric fields where necessary
@@ -222,6 +226,9 @@ export default function ProcessPage() {
                       onChange={(e) => updateStep(index, 'sort_order', e.target.value)}
                       className="w-full"
                     />
+                  </div>
+                  <div className="flex justify-end mt-2">
+                    <Button variant="destructive" onClick={() => removeStep(index)}>Remove</Button>
                   </div>
                 </div>
               ))}
