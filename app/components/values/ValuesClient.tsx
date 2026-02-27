@@ -30,6 +30,7 @@ export default function ValuesClient({ title, values }: Props) {
           {items.map((value) => (
             <ValueCard
               key={value.id}
+              image={value.media?.url ?? ""}
               title={value.title ?? ""}
               description={value.description ?? ""}
             />

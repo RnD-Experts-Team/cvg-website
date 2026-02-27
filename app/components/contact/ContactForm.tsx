@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
+import { toast } from "react-toastify";
 import type { HomePageData } from "@/app/lib/types/cms/home";
 
 type Props = {
@@ -24,9 +25,33 @@ const ContactForm: React.FC<Props> = ({ contact = null }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [localContact, setLocalContact] = useState<Props['contact'] | null>(null);
 
   const endpointBase = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
   const endpoint = endpointBase ? `${endpointBase}/contact-submissions` : "/contact-submissions";
+
+  // If no `contact` prop provided, fetch contact section client-side so component works standalone
+  useEffect(() => {
+    if (contact) return;
+    let mounted = true;
+    const fetchContact = async () => {
+      try {
+        const base = endpointBase;
+        if (!base) return;
+        const homeEndpoint = base.endsWith("/api") ? `${base}/home` : `${base}/api/home`;
+        const res = await fetch(homeEndpoint);
+        if (!res.ok) return;
+        const json = await res.json().catch(() => null);
+        const section = json?.data?.contact_section ?? null;
+        if (mounted) setLocalContact(section);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    fetchContact();
+    return () => { mounted = false; };
+  }, [contact, endpointBase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,27 +78,35 @@ const ContactForm: React.FC<Props> = ({ contact = null }) => {
 
       const json = await res.json().catch(() => ({}));
       if (res.ok && (json.success === true || json.id || json.data)) {
-        setSuccess(json.message ?? "Contact form submitted successfully.");
+        const msg = json.message ?? "Contact form submitted successfully.";
+        setSuccess(msg);
+        toast.success(msg);
         setFullName("");
         setEmail("");
         setPhone("");
         setDetails("");
       } else {
-        setError(json.message ?? `Submission failed (${res.status})`);
+        const errMsg = json.message ?? `Submission failed (${res.status})`;
+        setError(errMsg);
+        toast.error(errMsg);
       }
     } catch (err) {
-      setError("Network error — please try again.");
+      const netMsg = "Network error — please try again.";
+      setError(netMsg);
+      toast.error(netMsg);
     } finally {
       setLoading(false);
     }
   };
 
+  const contactData = contact ?? localContact;
+
   return (
     <section id="contact" ref={sectionRef} className="bg-[#EEEEEE] py-20">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="text-center mb-12 contact-animate">
-          <h2 className="text-4xl font-bold text-[#1E1E1E] mb-2">{contact?.title}</h2>
-          <p className="text-[#1E1E1E] text-lg">{contact?.subtitle}</p>
+          <h2 className="text-4xl font-bold text-[#1E1E1E] mb-2">{contactData?.title}</h2>
+          <p className="text-[#1E1E1E] text-lg">{contactData?.subtitle}</p>
         </div>
 
         <div className="max-w-[900px] mx-auto bg-[#EEEEEE] p-8 md:p-12 contact-animate">

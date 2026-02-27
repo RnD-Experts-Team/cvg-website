@@ -4,7 +4,7 @@ export default function Page() {
   return (
     <div style={{ padding: 12 }}>
       <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="text-muted-foreground mt-2">Welcome to your dashboard overview.</p>
+      <p className="text-muted-foreground mt-2">Welcome to your CVG-CMS.</p>
       <div className="mt-6">
         {/* Keep BlankPage available for quick preview on the index if desired */}
         {/* <BlankPage /> */}

@@ -27,6 +27,8 @@ const ValuesPage = () => {
       try {
         const response = await ValuesService.getValuesSection();
         setValuesSection(response.data);
+        // initialize imageFiles slots to keep indexes aligned with values
+        setImageFiles((response.data?.values ?? []).map(() => null));
       } catch (error) {
         toast.error("Error fetching values section");
       } finally {
@@ -41,10 +43,35 @@ const ValuesPage = () => {
     if (!valuesSection) return;
     setIsUpdating(true);
     try {
-      const response = await ValuesService.updateValuesSection({
-        title: valuesSection.title,
-        values: valuesSection.values,
-      });
+      // If any image files are present, send multipart FormData so files are uploaded
+      const hasFiles = imageFiles.some((f) => f instanceof File);
+
+      let response: any;
+      if (hasFiles) {
+        const form = new FormData();
+        if (valuesSection.title) form.append('title', String(valuesSection.title));
+
+        const vals = valuesSection.values || [];
+        vals.forEach((v: any, idx: number) => {
+          form.append(`values[${idx}][title]`, String(v.title ?? ''));
+          form.append(`values[${idx}][description]`, String(v.description ?? ''));
+          if (v.id && Number(v.id) > 0) form.append(`values[${idx}][id]`, String(v.id));
+          if (v.sort_order !== undefined) form.append(`values[${idx}][sort_order]`, String(v.sort_order));
+
+          const file = imageFiles[idx];
+          if (file instanceof File) {
+            // attach file for this particular value
+            form.append(`values[${idx}][image]`, file);
+          }
+        });
+
+        response = await ValuesService.updateValuesSection(form as unknown as any);
+      } else {
+        response = await ValuesService.updateValuesSection({
+          title: valuesSection.title,
+          values: valuesSection.values,
+        });
+      }
       toast.success("Values updated successfully");
       setValuesSection(response.data); // Update the state with the new data
     } catch (error) {
@@ -71,6 +98,34 @@ const ValuesPage = () => {
     const updatedImageFiles = [...imageFiles];
     updatedImageFiles[index] = file;
     setImageFiles(updatedImageFiles);
+  };
+
+  // Add a new value item
+  const addValue = () => {
+    if (!valuesSection) return;
+    const nextSort = (valuesSection.values?.length ?? 0) + 1;
+    const newValue: any = {
+      id: 0,
+      title: "",
+      description: "",
+      sort_order: nextSort,
+      media: { url: "", alt_text: "" },
+    };
+
+    setValuesSection({ ...valuesSection, values: [...(valuesSection.values || []), newValue] });
+    setImageFiles((prev) => {
+      const copy = [...prev];
+      copy.push(null);
+      return copy;
+    });
+  };
+
+  // Remove a value by index
+  const removeValue = (index: number) => {
+    if (!valuesSection) return;
+    const updated = (valuesSection.values || []).filter((_, i) => i !== index);
+    setValuesSection({ ...valuesSection, values: updated });
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (isLoading)
@@ -118,10 +173,15 @@ const ValuesPage = () => {
         />
       </div>
 
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Values</h2>
+        <Button variant="outline" onClick={addValue}>Add</Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {valuesSection?.values.map((value, index) => (
           <Card
-            key={value.id}
+            key={`${value.id}-${index}`}
             className="p-4 shadow-md rounded-lg border border-gray-200"
           >
             <div className="flex flex-col items-center">
@@ -131,9 +191,9 @@ const ValuesPage = () => {
                   src={
                     imageFiles[index]
                       ? URL.createObjectURL(imageFiles[index]) // Preview the selected file
-                      : value.media.url || "/placeholder.png" // Default to existing image or placeholder
+                      : (value.media?.url || "/placeholder.png") // Default to existing image or placeholder
                   }
-                  alt={value.media.alt_text || "Value Image"}
+                  alt={value.media?.alt_text || "Value Image"}
                   className="rounded-lg mb-4 w-[100px] h-[100px] object-cover"
                 />
                 {/* File input for changing image */}
@@ -166,6 +226,9 @@ const ValuesPage = () => {
                 className="mb-4 w-full"
                 rows={4}
               />
+              <div className="flex justify-end mt-2">
+                <Button variant="destructive" onClick={() => removeValue(index)}>Remove</Button>
+              </div>
             </div>
           </Card>
         ))}

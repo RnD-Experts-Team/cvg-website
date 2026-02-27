@@ -36,7 +36,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSecti
   const [services, setServices] = useState<any[]>(initialServices ?? []);
 
   // default show 4 services in the grid; toggle shows the rest
-  const visibleServices = showMore ? services : services.slice(0, 4);
+  // show 4 by default; when expanded show up to 8 cards max
+  const visibleServices = showMore ? services.slice(0, 8) : services.slice(0, 4);
 
   const toggleShowMore = () => {
     setShowMore((prev) => !prev);

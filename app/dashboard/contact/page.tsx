@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { ContactSection, ContactSubmission } from "./types";
 import { toast } from "react-toastify";
-import { getContactSection, getContactSubmissionById, getContactSubmissions, updateContactSection } from "./contact.service";
+import { getContactSection, getContactSubmissionById, getContactSubmissions, getContactSubmissionsPage, updateContactSection } from "./contact.service";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -16,6 +16,10 @@ import { Skeleton } from "../components/ui/skeleton";
 export default function ContactPage() {
   const [contactSection, setContactSection] = useState<ContactSection | null>(null);
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(10);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [newSubmissionId, setNewSubmissionId] = useState<number | null>(null); // ID of the selected contact submission for viewing
 
@@ -33,14 +37,38 @@ export default function ContactPage() {
 
     const fetchContactSubmissions = async () => {
       try {
-        const res = await getContactSubmissions();
-        // support both ApiResponse<{data: T[]}> and raw array returns
-        const list: any[] = Array.isArray(res)
-          ? res
-          : res && typeof res === 'object' && 'data' in res
-          ? (res as any).data
-          : [];
+        // fetch first page
+        const res = await getContactSubmissionsPage(1);
+
+        // normalize payload: could be { data: ContactSubmission[] } or paginated { data: { data: ContactSubmission[], total, per_page, current_page, last_page } }
+        let list: any[] = [];
+        let meta: any = null;
+
+        if (res && typeof res === 'object') {
+          if (Array.isArray(res.data)) {
+            // simple array response
+            list = res.data;
+          } else if (res.data && Array.isArray(res.data.data)) {
+            // paginated under res.data.data
+            list = res.data.data;
+            meta = res.data;
+          } else if (Array.isArray(res)) {
+            list = res;
+          }
+        }
+
         setSubmissions(list || []);
+        // set pagination metadata
+        const metaObj = meta ?? (res && res.data && typeof res.data === 'object' ? res.data : null);
+        const per = metaObj?.per_page ?? metaObj?.perPage ?? 10;
+        const total = metaObj?.total ?? (Array.isArray(list) ? list.length : 0);
+        const current = metaObj?.current_page ?? 1;
+        const last = metaObj?.last_page ?? Math.max(1, Math.ceil((total || 0) / (per || 10)));
+
+        setPerPage(per);
+        setTotalCount(total);
+        setCurrentPage(current);
+        setLastPage(last);
       } catch (err) {
         toast.error("Failed to fetch contact submissions.");
       }
@@ -82,6 +110,45 @@ export default function ContactPage() {
       toast.success(`Viewing submission from: ${submission.full_name}`);
     } catch (error) {
       toast.error("Error retrieving submission details.");
+    }
+  };
+
+  // fetch a specific page of submissions
+  const fetchSubmissionsPage = async (page: number) => {
+    setLoading(true);
+    try {
+      const res = await getContactSubmissionsPage(page);
+
+      let list: any[] = [];
+      let meta: any = null;
+
+      if (res && typeof res === 'object') {
+        if (Array.isArray(res.data)) {
+          list = res.data;
+        } else if (res.data && Array.isArray(res.data.data)) {
+          list = res.data.data;
+          meta = res.data;
+        } else if (Array.isArray(res)) {
+          list = res;
+        }
+      }
+
+      setSubmissions(list || []);
+
+      const metaObj = meta ?? (res && res.data && typeof res.data === 'object' ? res.data : null);
+      const per = metaObj?.per_page ?? metaObj?.perPage ?? 10;
+      const total = metaObj?.total ?? (Array.isArray(list) ? list.length : 0);
+      const current = metaObj?.current_page ?? page;
+      const last = metaObj?.last_page ?? Math.max(1, Math.ceil((total || 0) / (per || 10)));
+
+      setPerPage(per);
+      setTotalCount(total);
+      setCurrentPage(current);
+      setLastPage(last);
+    } catch (err) {
+      toast.error('Failed to fetch submissions page.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -201,7 +268,7 @@ export default function ContactPage() {
               </div>
             </CardContent>
           </Card>
-        ) : submissions.length > 0 ? (
+            ) : submissions.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Contact Submissions</CardTitle>
@@ -233,6 +300,14 @@ export default function ContactPage() {
                   </tbody>
                 </table>
               </div>
+                  {/* Pagination controls: only show if totalCount > perPage */}
+                  {totalCount > perPage && (
+                    <div className="mt-4 flex items-center justify-center gap-3">
+                      <Button onClick={() => fetchSubmissionsPage(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}>Prev</Button>
+                      <div className="px-3">Page {currentPage} / {lastPage}</div>
+                      <Button onClick={() => fetchSubmissionsPage(Math.min(lastPage, currentPage + 1))} disabled={currentPage >= lastPage}>Next</Button>
+                    </div>
+                  )}
             </CardContent>
           </Card>
         ) : (
@@ -242,3 +317,6 @@ export default function ContactPage() {
     </div>
   );
 }
+
+
+

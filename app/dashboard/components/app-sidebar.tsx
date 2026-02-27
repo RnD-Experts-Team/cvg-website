@@ -107,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="http://localhost:3000/" className=" flex items-center gap-5">
-                <img src="img/logo.png" className=" object-cover object-contain w-[25px] h-[25px]" />
+                <img src="/img/logo.png" className=" object-cover object-contain w-[25px] h-[25px]" />
                 <span className="text-base font-semibold">CVG-CMS</span>
               </a>
             </SidebarMenuButton>
