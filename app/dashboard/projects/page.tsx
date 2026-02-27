@@ -13,6 +13,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Label } from "../components/ui/label";
+import { Skeleton } from "../components/ui/skeleton";
 
 import {
   DropdownMenu,
@@ -152,7 +153,12 @@ export default function ProjectsPage() {
 
         <CardContent>
           {sectionLoading ? (
-            <p>Loading section...</p>
+              <div className="space-y-4 max-w-xl">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-10 w-1/3" />
+              </div>
           ) : (
             <div className="space-y-4 max-w-xl">
               <div className="space-y-2">
@@ -208,7 +214,32 @@ export default function ProjectsPage() {
 
         <CardContent>
           {loading ? (
-            <p>Loading...</p>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b text-left">
+                    <th className="p-3">Title</th>
+                    <th className="p-3">Description</th>
+                    <th className="p-3">Content</th>
+                    <th className="p-3">Category</th>
+                    <th className="p-3">Image</th>
+                    <th className="p-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="p-3 font-medium"><Skeleton className="h-4 w-40" /></td>
+                      <td className="p-3"><Skeleton className="h-4 w-48" /></td>
+                      <td className="p-3"><Skeleton className="h-4 w-56" /></td>
+                      <td className="p-3"><Skeleton className="h-4 w-32" /></td>
+                      <td className="p-3"><Skeleton className="h-12 w-12 rounded" /></td>
+                      <td className="p-3 text-right"><Skeleton className="h-8 w-20 mx-auto" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">

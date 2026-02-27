@@ -20,7 +20,10 @@ export default function FooterSocial({ socialMedia }: Props) {
 
           return items.map((item) => (
             <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer">
-              <p>{item.platform}</p>
+              {item.platform=='facebook' && <Image src="/img/facebook.png" alt="Facebook" width={24} height={24} />}
+              {item.platform=='twitter' && <Image src="/img/twitter.png" alt="Twitter" width={24} height={24} />}
+              {item.platform=='linkedin' && <Image src="/img/in.png" alt="LinkedIn" width={24} height={24} />}
+              {item.platform=='instagram' && <Image src="/img/insta.png" alt="Instagram" width={24} height={24} />}
             </a>
           ));
         })()}

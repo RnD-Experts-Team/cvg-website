@@ -11,11 +11,12 @@ import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Table } from "../components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Skeleton } from "../components/ui/skeleton";
 
 export default function ContactPage() {
   const [contactSection, setContactSection] = useState<ContactSection | null>(null);
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [newSubmissionId, setNewSubmissionId] = useState<number | null>(null); // ID of the selected contact submission for viewing
 
   // Fetch the contact section data and submissions
@@ -45,8 +46,16 @@ export default function ContactPage() {
       }
     };
 
-    fetchContactSection();
-    fetchContactSubmissions();
+    const fetchAll = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchContactSection(), fetchContactSubmissions()]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
   }, []);
 
   const handleSave = async () => {
@@ -122,48 +131,108 @@ export default function ContactPage() {
           </CardContent>
         </Card>
       ) : (
-        <p>Loading...</p>
+        loading ? (
+          <Card className="mb-10">
+            <CardHeader>
+              <CardTitle>
+                <Skeleton className="h-6 w-48" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-10 w-full mt-2" />
+                </div>
+
+                <div>
+                  <Skeleton className="h-4 w-32 mb-2" />
+                  <Skeleton className="h-24 w-full mt-2" />
+                </div>
+
+                <div>
+                  <Skeleton className="h-4 w-20 mb-2" />
+                  <Skeleton className="h-10 w-full mt-2" />
+                </div>
+
+                <div className="mt-2">
+                  <Skeleton className="h-10 w-40" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <p>Loading...</p>
+        )
       )}
 
       <h2 className="text-2xl font-bold mt-10 mb-4">Contact Submissions</h2>
 
       <div className="mt-8">
-        {submissions.length > 0 ? (
+        {loading ? (
           <Card>
             <CardHeader>
               <CardTitle>Contact Submissions</CardTitle>
             </CardHeader>
             <CardContent>
-               {loading ? (
-                <p>Loading...</p>
-              ) : (
-                <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="py-3">Name</th>
-                    <th className="py-3">Email</th>
-                    <th className="py-3">Phone</th>
-                    <th className="py-3">Project Details</th>
-                    <th className="py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {submissions.map((submission) => (
-                    <tr key={submission.id}>
-                      <td className="py-3 text-center">{submission.full_name}</td>
-                      <td className="py-3 text-center">{submission.email}</td>
-                      <td className="py-3 text-center">{submission.phone_number}</td>
-                      <td className="py-3 text-center">{submission.project_details}</td>
-                      <td className="py-3 text-center">
-                        <Button onClick={() => handleSubmissionClick(submission.id)}>View</Button>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="py-3">Name</th>
+                      <th className="py-3">Email</th>
+                      <th className="py-3">Phone</th>
+                      <th className="py-3">Project Details</th>
+                      <th className="py-3">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <tr key={idx} className="border-b">
+                        <td className="py-3 text-center"><Skeleton className="h-4 w-32 mx-auto" /></td>
+                        <td className="py-3 text-center"><Skeleton className="h-4 w-40 mx-auto" /></td>
+                        <td className="py-3 text-center"><Skeleton className="h-4 w-28 mx-auto" /></td>
+                        <td className="py-3 text-center"><Skeleton className="h-4 w-48 mx-auto" /></td>
+                        <td className="py-3 text-center"><Skeleton className="h-8 w-20 mx-auto" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-          )}
+            </CardContent>
+          </Card>
+        ) : submissions.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Submissions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="py-3">Name</th>
+                      <th className="py-3">Email</th>
+                      <th className="py-3">Phone</th>
+                      <th className="py-3">Project Details</th>
+                      <th className="py-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {submissions.map((submission) => (
+                      <tr key={submission.id}>
+                        <td className="py-3 text-center">{submission.full_name}</td>
+                        <td className="py-3 text-center">{submission.email}</td>
+                        <td className="py-3 text-center">{submission.phone_number}</td>
+                        <td className="py-3 text-center">{submission.project_details}</td>
+                        <td className="py-3 text-center">
+                          <Button onClick={() => handleSubmissionClick(submission.id)}>View</Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         ) : (

@@ -19,6 +19,7 @@ import {
 import { NavMain } from "@/app/dashboard/components/nav-main";
 import { NavSecondary } from "@/app/dashboard/components/nav-secondary";
 import { NavUser } from "@/app/dashboard/components/nav-user";
+import { getStoredUser } from "@/app/lib/http/auth"; // Import the function to get user data from localStorage
 import {
   Sidebar,
   SidebarContent,
@@ -31,9 +32,7 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    email: "",
   },
   navMain: [
     {
@@ -79,33 +78,37 @@ const data = {
     {
       title: "About",
       url: "/dashboard/about",
-      icon: Info ,
+      icon: Info,
     },
     {
       title: "Contact",
       url: "/dashboard/contact",
-      icon: UserCircleIcon ,
+      icon: UserCircleIcon,
     },
   ],
   navSecondary: [
     {
       title: "Settings",
-      url: "/dashboard/settings",
+      url: "/dashboard/setting",
       icon: SettingsIcon,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [storedUser] = React.useState(() => {
+    return getStoredUser() ?? data.user;
+  });
+
   return (
     <Sidebar collapsible="offcanvas" variant="sidebar" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="http://localhost:3000/">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">CVG-Website</span>
+              <a href="http://localhost:3000/" className=" flex items-center gap-5">
+                <img src="img/logo.png" className=" object-cover object-contain w-[25px] h-[25px]" />
+                <span className="text-base font-semibold">CVG-CMS</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -116,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser  />
       </SidebarFooter>
     </Sidebar>
   );

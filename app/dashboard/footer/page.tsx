@@ -10,6 +10,7 @@ import { Input } from "../components/ui/input";
 import { Separator } from "../components/ui/separator";
 import { Button } from "../components/ui/button";
 import { Switch } from "../components/ui/switch";
+import { Skeleton } from "../components/ui/skeleton";
 
 
 export default function FooterPage() {
@@ -96,7 +97,79 @@ export default function FooterPage() {
   }
 
   if (loading || !data)
-    return <div className="p-6">Loading footer...</div>;
+    return (
+      <div className="p-6 max-w-full space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Skeleton className="h-6 w-40" />
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">
+                <Skeleton className="h-5 w-32" />
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+
+                <div>
+                  <Skeleton className="h-4 w-28 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+
+                <div>
+                  <Skeleton className="h-4 w-20 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+
+                <div>
+                  <Skeleton className="h-4 w-28 mb-2" />
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-8 w-20" />
+              </div>
+
+              {Array.from({ length: 2 }).map((_, idx) => (
+                <Card key={idx} className="p-4 space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-6 w-12" />
+                      <span className="text-sm"><Skeleton className="h-4 w-16" /></span>
+                    </div>
+
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <Separator />
+
+            <Skeleton className="h-12 w-full rounded-md" />
+          </CardContent>
+        </Card>
+      </div>
+    );
 
   return (
     <div className="p-6 max-w-full space-y-6 " style={{ padding: 12 }}>

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../../components/ui/alert-dialog";
+import { Skeleton } from "../../components/ui/skeleton";
 
 
 
@@ -82,8 +83,30 @@ export default function CategoriesPage() {
 
         <CardContent>
           {loading ? (
-            <p>Loading...</p>
-          ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="p-3">Title</th>
+                      <th className="p-3">Description</th>
+                      <th className="p-3">Slug</th>
+                      <th className="p-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <tr key={idx} className="border-b">
+                        <td className="p-3 font-medium"><Skeleton className="h-4 w-40" /></td>
+                        <td className="p-3"><Skeleton className="h-4 w-64" /></td>
+                        <td className="p-3"><Skeleton className="h-4 w-32" /></td>
+                        <td className="p-3 text-right"><Skeleton className="h-8 w-20 mx-auto" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>

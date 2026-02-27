@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 import Link from "next/link";
 import gsap from "gsap";
-import { projects } from "@/app/components/ProjectSections/ProjectData";
+import { getProjectsList } from "@/app/lib/api/home";
+import type { ProjectItem } from "@/app/lib/types/cms/home";
 
 const ProjectDetail: React.FC = () => {
   const params = useParams();
@@ -17,8 +18,21 @@ const ProjectDetail: React.FC = () => {
   const imageRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
 
-  const project = useMemo(() => {
-    return projects.find((p) => p.id === Number(id));
+  const [project, setProject] = useState<ProjectItem | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!id) return;
+    getProjectsList()
+      .then((list) => {
+        if (!mounted) return;
+        const found = list.find((p) => p.id === Number(id));
+        setProject(found);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
   // Entrance animation on mount
@@ -74,7 +88,7 @@ const ProjectDetail: React.FC = () => {
           className="flex items-center gap-3 mb-6 hover:opacity-70 transition"
         >
           <BiArrowBack size={30} className="text-[#1E1E1E]" />
-          <h2 className="text-3xl md:text-4xl font-bold">{project.title}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{project?.title}</h2>
         </button>
       </div>
 
@@ -85,18 +99,28 @@ const ProjectDetail: React.FC = () => {
         </h1>
 
         {/* Image */}
-        <div ref={imageRef} className="w-full rounded-lg overflow-hidden shadow-md">
-          <img
-            src={project.image}
-            alt={project.title}
-            className="w-full h-[250px] sm:h-[400px] md:h-[500px] object-cover"
-          />
+        <div ref={imageRef} className="w-full rounded-lg overflow-hidden shadow-md bg-gray-100">
+          {project.images && project.images.length > 0 ? (
+            (() => {
+              const first = project.images[0] as any;
+              const url = first.media?.url || first.url || (first.media?.path ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')}/storage/${first.media.path}` : "");
+              return url ? (
+                <img src={url} alt={project.title} className="w-full h-[250px] sm:h-[400px] md:h-[500px] object-cover" />
+              ) : (
+                <div className="w-full h-[250px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-gray-500">No image available</div>
+              );
+            })()
+          ) : (
+            <div className="w-full h-[250px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-gray-500">
+              No image available
+            </div>
+          )}
         </div>
 
         {/* Description */}
         <div ref={descRef} className="max-w-3xl">
           <p className="text-gray-700 leading-relaxed text-base md:text-lg">
-            {project.description}
+            {project.content}
           </p>
         </div>
 

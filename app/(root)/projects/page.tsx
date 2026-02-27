@@ -2,8 +2,6 @@
 
 import ContactForm from "@/app/components/contact/ContactForm";
 import ProjectCard from "@/app/components/ProjectSections/ProjectCard";
-import { projects } from "@/app/components/ProjectSections/ProjectData";
-import { ProjectCategory } from "@/types/projects";
 import { useState, useMemo } from "react";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
@@ -15,33 +13,25 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const categories: ProjectCategory[] = [
-  "Pizza Stores",
-  "Retail Shops",
-  "Cafes",
-  "Restaurants",
-];
+import { getProjectsList, getCategories, getProjectsSection } from "@/app/lib/api/home";
+import type { ProjectItem, CategoryItem } from "@/app/lib/types/cms/home";
 
-const categoryDescriptions: Record<ProjectCategory, string> = {
-  "Pizza Stores":
-    "Modern and vibrant pizza store concepts designed for high customer engagement.",
-  "Retail Shops":
-    "Smart retail environments optimized for branding and conversion.",
-  Cafes:
-    "Warm and welcoming café spaces that enhance customer comfort.",
-  Restaurants:
-    "Premium restaurant designs combining atmosphere and functionality.",
-};
+// categories and descriptions will come from API; start empty and populate on mount
+// categories: list of category titles
 
 export default function ProjectsPage() {
-  const [activeCategory, setActiveCategory] =
-    useState<ProjectCategory>("Pizza Stores");
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [categoriesList, setCategoriesList] = useState<CategoryItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("");
+
 
   const headerRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const [headerTitle, setHeaderTitle] = useState<string>("");
+  const [headerDescription, setHeaderDescription] = useState<string>("");
 
   // Entrance animation (once on mount)
   useEffect(() => {
@@ -98,18 +88,41 @@ export default function ProjectsPage() {
     }
   }, [activeCategory]);
 
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([getProjectsList(), getCategories(), getProjectsSection()])
+      .then(([projList, cats, sectionPayload]) => {
+        if (!mounted) return;
+        setProjects(projList);
+        setCategoriesList(cats);
+        // default active category to first category title if available
+        const first = cats[0]?.title ?? projList[0]?.category?.title ?? "";
+        setActiveCategory(first);
+
+        if (sectionPayload && sectionPayload.projects_section && sectionPayload.projects_section.projects_section) {
+          setHeaderTitle(sectionPayload.projects_section.projects_section.title ?? headerTitle);
+          setHeaderDescription(sectionPayload.projects_section.projects_section.description ?? headerDescription);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const filteredProjects = useMemo(
-    () => projects.filter((project) => project.category === activeCategory),
-    [activeCategory]
+    () => projects.filter((project) => (project.category?.title ?? "") === activeCategory),
+    [activeCategory, projects]
   );
 
   const categoryCounts = useMemo(() => {
-    const map = {} as Record<ProjectCategory, number>;
-    categories.forEach((c) => {
-      map[c] = projects.filter((p) => p.category === c).length;
+    const map = {} as Record<string, number>;
+    const titles = categoriesList.length ? categoriesList.map((c) => c.title) : Array.from(new Set(projects.map((p) => p.category?.title ?? "")));
+    titles.forEach((c) => {
+      map[c] = projects.filter((p) => (p.category?.title ?? "") === c).length;
     });
     return map;
-  }, []);
+  }, [categoriesList, projects]);
 
   const handleCategoryKeyDown = (
     e: React.KeyboardEvent<HTMLButtonElement>,
@@ -117,21 +130,25 @@ export default function ProjectsPage() {
   ) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       const dir = e.key === "ArrowRight" ? 1 : -1;
-      const next = (idx + dir + categories.length) % categories.length;
-      setActiveCategory(categories[next]);
-      const el = document.querySelector(`[data-index=\"${next}\"]`) as
-        | HTMLButtonElement
-        | null;
+      const titles = categoriesList.length ? categoriesList.map((c) => c.title) : Array.from(new Set(projects.map((p) => p.category?.title ?? "")));
+      if (!titles.length) return;
+      const next = (idx + dir + titles.length) % titles.length;
+      setActiveCategory(titles[next]);
+      const el = document.querySelector(`[data-index="${next}"]`) as HTMLButtonElement | null;
       el?.focus();
       e.preventDefault();
     } else if (e.key === "Home") {
-      setActiveCategory(categories[0]);
-      (document.querySelector(`[data-index=\"0\"]`) as HTMLButtonElement)?.focus();
+      const titles = categoriesList.length ? categoriesList.map((c) => c.title) : Array.from(new Set(projects.map((p) => p.category?.title ?? "")));
+      if (!titles.length) return;
+      setActiveCategory(titles[0]);
+      (document.querySelector(`[data-index="0"]`) as HTMLButtonElement)?.focus();
       e.preventDefault();
     } else if (e.key === "End") {
-      const last = categories.length - 1;
-      setActiveCategory(categories[last]);
-      (document.querySelector(`[data-index=\"${last}\"]`) as HTMLButtonElement)?.focus();
+      const titles = categoriesList.length ? categoriesList.map((c) => c.title) : Array.from(new Set(projects.map((p) => p.category?.title ?? "")));
+      if (!titles.length) return;
+      const last = titles.length - 1;
+      setActiveCategory(titles[last]);
+      (document.querySelector(`[data-index="${last}"]`) as HTMLButtonElement)?.focus();
       e.preventDefault();
     }
   };
@@ -142,8 +159,9 @@ export default function ProjectsPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div ref={headerRef}>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#191919] mb-8">
-            Our Projects
+            {headerTitle}
           </h1>
+          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-8">{headerDescription}</p>
         </div>
 
         {/* Category Tabs (accessible + scrollable on small screens) */}
@@ -154,7 +172,9 @@ export default function ProjectsPage() {
         >
           <div ref={tabsRef} className="-mx-4 sm:mx-0 overflow-x-auto">
             <div className="inline-flex flex-wrap justify-center gap-3 px-4 sm:px-0">
-              {categories.map((category, idx) => {
+              {(categoriesList.length ? categoriesList.map((c) => c.title) : Array.from(new Set(projects.map((p) => p.category?.title ?? ""))))
+                .map((category) => category)
+                .map((category, idx) => {
                 const isActive = activeCategory === category;
                 return (
                   <button
@@ -172,9 +192,9 @@ export default function ProjectsPage() {
                           : "text-gray-600 hover:text-[#F68620] hover:bg-gray-50"
                       }`}
                   >
-                    {category}
+                      {category}
                     <span className="ml-2 inline-flex items-center justify-center rounded-full bg-white/20 px-2 py-0.5 text-xs text-gray-600">
-                      {categoryCounts[category]}
+                      {categoryCounts[category] ?? 0}
                     </span>
                   </button>
                 );
@@ -192,7 +212,7 @@ export default function ProjectsPage() {
           ) : (
             filteredProjects.map((project) => (
               <div key={project.id} className="w-full flex justify-center">
-                <ProjectCard {...project} />
+                <ProjectCard project={project} />
               </div>
             ))
           )}
@@ -204,7 +224,7 @@ export default function ProjectsPage() {
             {activeCategory}
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            {categoryDescriptions[activeCategory]}
+            {categoriesList.find((c) => c.title === activeCategory)?.description ?? ""}
           </p>
         </div>
       </div>

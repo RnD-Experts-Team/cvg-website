@@ -1,5 +1,3 @@
-import BlankPage from "./blank";
-
 export default function Page() {
   // Dashboard index content — keep it minimal. Nested routes (e.g. /dashboard/blank)
   // will now render inside the dashboard layout (`layout.tsx`).

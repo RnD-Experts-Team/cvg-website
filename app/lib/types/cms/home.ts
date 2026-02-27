@@ -137,7 +137,70 @@ export interface HomePageData {
     process_section?: ProcessSection;
     contact_section?: ContactSection;
     hero: HeroSectionCMS;
+    // Projects section coming from /api/home
+    projects_section?: {
+      projects_section: {
+        id: number;
+        title?: string | null;
+        description?: string | null;
+        created_at?: string;
+        updated_at?: string;
+      };
+      projects: ProjectItem[];
+    };
+    // Services section coming from /api/home
+    services_section?: {
+      services_section: {
+        id: number;
+        title?: string | null;
+        description?: string | null;
+        content?: string | null;
+        image_media_id?: number | null;
+        button_text?: string | null;
+        created_at?: string;
+        updated_at?: string;
+        image?: MediaItem | null;
+      };
+      services: ServiceItem[];
+    };
     // footer, projects_section, ... (add when you implement them)
   };
   message: string;
+}
+
+export interface CategoryItem {
+  id: number;
+  title: string;
+  description?: string | null;
+  slug?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProjectItem {
+  id: number;
+  category_id: number;
+  title: string;
+  description?: string | null;
+  content?: string | null;
+  featured?: number;
+  slug?: string;
+  published_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  category?: CategoryItem;
+  images?: Array<any>;
+}
+
+export interface ServiceItem {
+  id: number;
+  image_media_id?: number | null;
+  title?: string | null;
+  description?: string | null;
+  content?: string | null;
+  featured?: boolean;
+  slug?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  image?: MediaItem | null;
 }
