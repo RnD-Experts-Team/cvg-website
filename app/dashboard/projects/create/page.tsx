@@ -12,6 +12,12 @@ import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(
+  () => import("../../components/RichTextEditor"),
+  { ssr: false },
+);
 
 import {
   Select,
@@ -67,7 +73,7 @@ export default function CreateProjectPage() {
   async function handleCreate() {
     if (!title.trim()) return toast.error("Title is required");
     if (!description.trim()) return toast.error("Description is required");
-    if (!content.trim()) return toast.error("Content is required");
+    if (!content.replace(/<[^>]*>/g, "").trim()) return toast.error("Content is required");
     if (!categoryId) return toast.error("Category is required");
 
     try {
@@ -120,7 +126,7 @@ export default function CreateProjectPage() {
 
           <div>
             <Label>Content</Label>
-            <Textarea value={content} onChange={(e) => setContent(e.target.value)} />
+            <RichTextEditor initialHtml={content} onChange={setContent} />
           </div>
 
           <div className="space-y-2">

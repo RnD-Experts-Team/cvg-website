@@ -13,6 +13,12 @@ import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(
+  () => import("../../../components/RichTextEditor"),
+  { ssr: false },
+);
 
 import {
   Select,
@@ -87,7 +93,7 @@ export default function EditProjectPage() {
   async function handleUpdate() {
     if (!form.title.trim()) return toast.error("Title is required");
     if (!form.description.trim()) return toast.error("Description is required");
-    if (!form.content.trim()) return toast.error("Content is required");
+    if (!form.content.replace(/<[^>]*>/g, "").trim()) return toast.error("Content is required");
     if (!form.category_id) return toast.error("Category is required");
 
     try {
@@ -201,11 +207,9 @@ export default function EditProjectPage() {
           {/* Content */}
           <div>
             <Label>Content</Label>
-            <Textarea
-              value={form.content}
-              onChange={(e) =>
-                setForm({ ...form, content: e.target.value })
-              }
+            <RichTextEditor
+              initialHtml={form.content}
+              onChange={(html) => setForm({ ...form, content: html })}
             />
           </div>
 

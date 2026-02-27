@@ -121,9 +121,19 @@ export default function ProjectDetailClient({ project }: Props) {
 
         {/* Description */}
         <div ref={descRef} className="max-w-3xl">
-          <p className="text-gray-700 leading-relaxed text-sm sm:text-base md:text-lg">
-            {project.content}
-          </p>
+          <div
+            className="prose prose-gray max-w-none text-sm sm:text-base md:text-lg leading-relaxed
+              prose-headings:text-[#1E1E1E] prose-headings:font-bold
+              prose-h1:text-2xl prose-h1:sm:text-3xl
+              prose-h2:text-xl prose-h2:sm:text-2xl
+              prose-h3:text-lg prose-h3:sm:text-xl
+              prose-p:text-gray-700 prose-p:leading-relaxed
+              prose-a:text-[#F68620] prose-a:underline
+              prose-strong:text-[#1E1E1E]
+              prose-blockquote:border-l-[#F68620] prose-blockquote:text-gray-600
+              prose-ul:list-disc prose-ol:list-decimal"
+            dangerouslySetInnerHTML={{ __html: project.content || "" }}
+          />
         </div>
       </div>
     </main>
