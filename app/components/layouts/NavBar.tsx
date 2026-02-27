@@ -1,28 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import gsap from "gsap";
 import { NavbarData } from "../navbar/navbar.types";
-import { getNavbarData } from "@/app/lib/navbar.service";
 import NavbarLogo from "../navbar/NavbarLogo";
 import NavbarLinks from "../navbar/NavbarLinks";
 import NavbarMobile from "../navbar/NavbarMobile";
+import { useEffect } from "react";
 
-export default function Navbar() {
+interface NavbarProps {
+  data?: NavbarData;
+}
+
+export default function Navbar({ data: serverData }: NavbarProps) {
   const pathname = usePathname();
-  const [data, setData] = useState<NavbarData | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isFixed, setIsFixed] = useState(false);
 
   const navRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
 
-  // Fetching Navbar Data
-  useEffect(() => {
-    getNavbarData().then(setData);
-  }, []);
+  const data = serverData ?? null;
 
   // GSAP Scroll Behavior
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Navbar() {
       ref={navRef}
       className={`w-full z-50 transition-colors duration-300 bg-[linear-gradient(180deg,#EEEEEE_0%,rgba(248,248,248,0.5)_100%)] backdrop-blur-[5px] shadow-[0_0_10px_0_#00000040] ${isFixed ? "fixed top-0 left-0" : "absolute"}`}
     >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
         
         {/* Logo */}
         <NavbarLogo logoUrl={data.logoUrl} />

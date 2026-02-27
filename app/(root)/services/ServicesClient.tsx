@@ -113,7 +113,8 @@ export default function ServicesClient({
       const res = await fetch(endpoint);
       if (!res.ok)
         throw new Error(`Failed to fetch services page ${page}: ${res.status}`);
-      const json = await res.json();
+      const text = await res.text();
+      const json = JSON.parse(text.replace(/http:\/\/cvg\.pnehomes\.com/g, 'https://cvg.pnehomes.com'));
       const pagePayload = json.data?.services ?? json.data ?? json;
       const pageData = pagePayload.data ?? pagePayload;
 
@@ -172,7 +173,7 @@ export default function ServicesClient({
                 <div className="service-image w-full">
                   <div className="w-full h-[240px] sm:h-[300px] md:h-[340px] lg:h-[380px] rounded-lg overflow-hidden px-5 lg:px-0">
                     <img
-                      src={service.image?.url}
+                      src={service.image?.url?.replace('http://', 'https://')}
                       alt={service.image?.title}
                       className="w-full h-full object-cover object-center rounded-lg"
                     />

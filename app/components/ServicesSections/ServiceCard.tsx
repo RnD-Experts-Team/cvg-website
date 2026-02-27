@@ -20,7 +20,7 @@ const ServiceCard = forwardRef<HTMLDivElement, ServiceCardProps>(
     return (
       <div
         ref={ref}
-        className="service-card bg-[#F68620] rounded-[10px] w-full max-w-[260px] sm:w-[250px] px-6 sm:px-[46px] pt-10 pb-12 flex flex-col items-center text-center h-[320px] flex-none justify-between hover:-translate-y-2 transition-transform duration-300"
+        className="service-card bg-[#F68620] rounded-[10px] w-full px-6 pt-10 pb-12 flex flex-col items-center text-center min-h-[320px] justify-between hover:-translate-y-2 transition-transform duration-300"
       >
         <div className="mt-4">
           {service?.image?.url ? (
@@ -34,10 +34,10 @@ const ServiceCard = forwardRef<HTMLDivElement, ServiceCardProps>(
           )}
 
           <div>
-            <h3 className="text-offwhite font-normal text-xl mb-2.5">
+            <h3 className="text-white font-normal text-xl mb-2.5 line-clamp-1">
               {service?.title}
             </h3>
-            <p className="text-offwhite text-sm">
+            <p className="text-white text-sm line-clamp-3">
               { service?.description ?? ""}
             </p>
           </div>
@@ -55,4 +55,19 @@ const ServiceCard = forwardRef<HTMLDivElement, ServiceCardProps>(
 );
 
 ServiceCard.displayName = "ServiceCard";
+
+/* ─── Skeleton matching the service card layout ───────────────────────── */
+
+export const ServiceCardSkeleton: React.FC = () => (
+  <div className="bg-[#F68620]/20 rounded-[10px] w-full px-6 pt-10 pb-12 flex flex-col items-center text-center min-h-[320px] justify-between service-card">
+    <div className="mt-4 flex flex-col items-center w-full">
+      <div className="w-[51px] h-[51px] rounded-md bg-gray-200/60 animate-pulse mb-[16px]" />
+      <div className="h-5 w-3/4 bg-gray-200/60 rounded animate-pulse mb-2.5" />
+      <div className="h-4 w-full bg-gray-200/40 rounded animate-pulse" />
+      <div className="h-4 w-5/6 bg-gray-200/40 rounded animate-pulse mt-1" />
+    </div>
+    <div className="h-9 w-24 bg-gray-200/60 rounded-[10px] animate-pulse mt-7" />
+  </div>
+);
+
 export default ServiceCard;

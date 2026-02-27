@@ -2,6 +2,7 @@
 
 import { HomePageData } from "../types/cms/home";
 import type { ProjectItem, CategoryItem, ServiceItem, MediaItem } from "../types/cms/home";
+import { parseJsonHttps } from "../utils/ensure-https";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -25,7 +26,7 @@ export async function getHomeData(options: { revalidate?: number } = {}): Promis
     throw new Error(`Failed to fetch home data: ${res.status} ${res.statusText}`);
   }
 
-  return res.json();
+  return parseJsonHttps<HomePageData>(res);
 }
 
 // Optional: more specific helpers if needed later
@@ -91,7 +92,7 @@ export async function getProjectsList(): Promise<ProjectItem[]> {
   const mediaFetches = idArray.map((id) => fetch(`${mediaEndpointBase}/media/${id}`, { next: { revalidate: 3600 } }).then(async (r) => {
     if (!r.ok) return null;
     try {
-      const j = await r.json();
+      const j = await parseJsonHttps<any>(r);
       return j.data ?? null;
     } catch {
       return null;
@@ -126,7 +127,7 @@ export async function getCategories(): Promise<CategoryItem[]> {
 
   const res = await fetch(endpoint, { next: { revalidate: 3600 } });
   if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
-  const json = await res.json();
+  const json = await parseJsonHttps<any>(res);
   return json.data ?? [];
 }
 
@@ -136,7 +137,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectItem | unde
 
   const res = await fetch(endpoint, { next: { revalidate: 300 } });
   if (!res.ok) return undefined;
-  const json = await res.json();
+  const json = await parseJsonHttps<any>(res);
   return json.data as ProjectItem | undefined;
 }
 
@@ -155,7 +156,7 @@ export async function getServicesListFromApi(): Promise<ServiceItem[]> {
 
   const res = await fetch(endpoint, { next: { revalidate: 600 } });
   if (!res.ok) throw new Error(`Failed to fetch services: ${res.status}`);
-  const json = await res.json();
+  const json = await parseJsonHttps<any>(res);
 
   // API returns services under json.data.services.data (paginated) or json.data.services
   const services: ServiceItem[] = json.data?.services?.data ?? json.data?.services ?? [];
@@ -176,7 +177,7 @@ export async function getServicesListFromApi(): Promise<ServiceItem[]> {
       .then(async (r) => {
         if (!r.ok) return null;
         try {
-          const j = await r.json();
+          const j = await parseJsonHttps<any>(r);
           return (j.data ?? null) as MediaItem | null;
         } catch {
           return null;
@@ -211,7 +212,7 @@ export async function getServicesPage(page: number = 1): Promise<any> {
 
   const res = await fetch(endpoint, { next: { revalidate: 600 } });
   if (!res.ok) throw new Error(`Failed to fetch services page ${page}: ${res.status}`);
-  const json = await res.json();
+  const json = await parseJsonHttps<any>(res);
 
   // return the paginated services object (json.data.services)
   return json.data?.services ?? json.data;

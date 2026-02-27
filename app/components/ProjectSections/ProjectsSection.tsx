@@ -1,89 +1,116 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProjectCard from "./ProjectCard";
-import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
-import { getProjectsList } from "@/app/lib/api/home";
-import { getProjectsSection } from "@/app/lib/api/home";
 import type { ProjectItem } from "@/app/lib/types/cms/home";
 
-const ProjectsSection: React.FC = () => {
-  const [projects, setProjects] = useState<ProjectItem[]>([]);
-  const [featuredProjects, setFeaturedProjects] = useState<ProjectItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [sectionTitle, setSectionTitle] = useState<string>("Our Projects");
-  const [sectionDescription, setSectionDescription] = useState<string>("Discover our latest commercial design solutions across pizza stores, retail shops, cafes, and restaurants.");
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+interface ProjectsSectionProps {
+  projects?: ProjectItem[];
+  title?: string;
+  description?: string;
+}
+
+const ProjectsSection: React.FC<ProjectsSectionProps> = ({
+  projects = [],
+  title = "Our Projects",
+  description = "Discover our latest commercial design solutions across pizza stores, retail shops, cafes, and restaurants.",
+}) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  /* ── Derive featured projects (first per category) ─────────────── */
+
+  const featuredProjects = useMemo(() => {
+    const seen = new Set<number | string>();
+    const featured: ProjectItem[] = [];
+    for (const p of projects) {
+      const key = p.category?.title ?? p.category_id;
+      if (!seen.has(key)) {
+        seen.add(key);
+        featured.push(p);
+      }
+    }
+    return featured;
+  }, [projects]);
+
+  /* ── Scroll-triggered entrance ──────────────────────────────────── */
 
   useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-    Promise.all([getProjectsList(), getProjectsSection()])
-      .then(([list, sectionPayload]) => {
-        if (!mounted) return;
-        setProjects(list);
-        // pick first project per category.title (if available) or category_id
-        const seen = new Set<number | string>();
-        const featured: ProjectItem[] = [];
-        for (const p of list) {
-          const key = p.category?.title ?? p.category_id;
-          if (!seen.has(key)) {
-            seen.add(key);
-            featured.push(p);
-          }
+    const ctx = gsap.context(() => {
+      /* Header: slide up + fade */
+      if (headerRef.current) {
+        gsap.set(headerRef.current, { autoAlpha: 0, y: 40 });
+        ScrollTrigger.create({
+          trigger: headerRef.current,
+          start: "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.to(headerRef.current!, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out",
+            });
+          },
+        });
+      }
+
+      /* Cards: staggered scale + slide + fade */
+      if (gridRef.current) {
+        const cards = gridRef.current.querySelectorAll(".project-card");
+        if (cards.length) {
+          gsap.set(cards, { autoAlpha: 0, y: 60, scale: 0.92 });
+          ScrollTrigger.create({
+            trigger: gridRef.current,
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              gsap.to(cards, {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                stagger: { amount: 0.6, from: "start" },
+                duration: 0.7,
+                ease: "back.out(1.4)",
+              });
+            },
+          });
         }
-        setFeaturedProjects(featured);
+      }
+    }, sectionRef);
 
-        if (sectionPayload && sectionPayload.projects_section && sectionPayload.projects_section.projects_section) {
-          setSectionTitle(sectionPayload.projects_section.projects_section.title ?? sectionTitle);
-          setSectionDescription(sectionPayload.projects_section.projects_section.description ?? sectionDescription);
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    return () => ctx.revert();
+  }, [featuredProjects]);
 
-  const gridRef = useScrollAnimation<HTMLDivElement>({
-    childSelector: ".project-card",
-    from: { autoAlpha: 0, y: 50 },
-    stagger: 0.12,
-    duration: 0.8,
-    start: "top 85%",
-  });
-
-  const headerRef = useScrollAnimation<HTMLDivElement>({
-    from: { autoAlpha: 0, y: 30 },
-    duration: 0.7,
-    animateContainer: true,
-    start: "top 90%",
-  });
+  /* ── Render ─────────────────────────────────────────────────────── */
 
   return (
-    <section id="projects" className="bg-[#EEEEEE] py-20">
+    <section ref={sectionRef} id="projects" className="bg-[#EEEEEE] py-20">
       <div className="max-w-[1440px] mx-auto px-6 md:px-20">
+
+        {/* Header */}
         <div ref={headerRef} className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#1E1E1E] mb-4">{sectionTitle}</h2>
-          <p className="text-[#1E1E1E] max-w-3xl mx-auto leading-relaxed">{sectionDescription}</p>
+          <h2 className="text-4xl font-bold text-[#1E1E1E] mb-4">{title}</h2>
+          <p className="text-[#1E1E1E] max-w-3xl mx-auto leading-relaxed">
+            {description}
+          </p>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
-          {loading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="w-full max-w-sm project-card">
-                  <div className="animate-pulse">
-                    <div className="h-48 bg-gray-300 rounded-lg mb-4" />
-                    <div className="h-4 bg-gray-300 rounded w-5/6 mb-2" />
-                    <div className="h-4 bg-gray-300 rounded w-3/4" />
-                  </div>
-                </div>
-              ))
-            : featuredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} className="project-card" />
-              ))}
+        {/* Grid */}
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        >
+          {featuredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
         </div>
       </div>
     </section>

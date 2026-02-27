@@ -1,5 +1,7 @@
 import axios from "axios";
 import { NavbarData } from "../components/navbar/navbar.types";
+import { ensureHttps } from "./utils/ensure-https";
+import { getSiteMetadata } from "./api/home";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -7,8 +9,21 @@ const api = axios.create({
 
 export async function getNavbarData(): Promise<NavbarData> {
   try {
-    const res = await api.get<NavbarData>("/navbar");
-    return res.data;
+    const [res, siteMetadata] = await Promise.all([
+      api.get<NavbarData>("/navbar"),
+      getSiteMetadata().catch(() => undefined),
+    ]);
+    const data = res.data;
+
+    // Use logo from site metadata if available; fall back to navbar response
+    const logoFromMetadata = siteMetadata?.logo?.url;
+    if (logoFromMetadata) {
+      data.logoUrl = ensureHttps(logoFromMetadata);
+    } else if (data && typeof data === "object" && "logoUrl" in data && typeof data.logoUrl === "string") {
+      data.logoUrl = ensureHttps(data.logoUrl);
+    }
+
+    return data;
   } catch {
     return mockNavbarData;
   }

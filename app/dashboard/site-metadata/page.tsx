@@ -162,9 +162,9 @@ export default function SiteMetadataPage() {
 
           <Separator />
 
+          
           {/* Logo */}
-          {/* Logo */}
-          {/* <div className="space-y-4">
+          <div className="space-y-4">
             <h3 className="font-semibold">Logo</h3>
 
             <img
@@ -210,9 +210,9 @@ export default function SiteMetadataPage() {
                 })
               }
             />
-          </div> */}
+          </div>
 
-          {/* <Separator /> */}
+          <Separator />
 
           
 

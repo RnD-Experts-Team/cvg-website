@@ -2,7 +2,36 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { NavItem, NavContact } from "./navbar.types";
+
+/**
+ * After cross-page navigation, wait for the target element to appear
+ * then jump to it INSTANTLY. Re-enforces scroll position multiple times
+ * to beat any race with Next.js scroll restoration.
+ */
+function jumpToHashAfterNav(hash: string, maxWait = 4000) {
+  const start = Date.now();
+  let scrollCount = 0;
+
+  const scrollTo = () => {
+    const el = document.getElementById(hash);
+    if (el) {
+      el.scrollIntoView({ behavior: "instant", block: "start" });
+      scrollCount++;
+      // Re-enforce a few times to beat any async scroll-to-top from Next.js
+      if (scrollCount < 5) {
+        requestAnimationFrame(scrollTo);
+      } else {
+        history.replaceState(null, "", `/#${hash}`);
+      }
+    } else if (Date.now() - start < maxWait) {
+      requestAnimationFrame(scrollTo);
+    }
+  };
+
+  requestAnimationFrame(scrollTo);
+}
 
 interface Props {
   items: NavItem[];
@@ -11,6 +40,7 @@ interface Props {
 }
 
 export default function NavbarLinks({ items, contact, pathname }: Props) {
+  const router = useRouter();
   const [currentHash, setCurrentHash] = useState<string>("");
 
   useEffect(() => {
@@ -22,19 +52,21 @@ export default function NavbarLinks({ items, contact, pathname }: Props) {
   }, []);
 
   function handleAnchorClick(e: React.MouseEvent<HTMLAnchorElement>, link: string) {
-    if (!link.includes("#")) return; // not an anchor
+    if (!link.includes("#")) return;
 
     const [, hash] = link.split("#");
+    e.preventDefault();
 
-    // same-page -> smooth scroll, don't trigger full navigation
     if (pathname === "/") {
-      e.preventDefault();
+      // Same page — smooth scroll directly
       const el = document.getElementById(hash);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      // update URL without navigation
-      history.replaceState(null, "", `#${hash}`);
+      history.replaceState(null, "", `/#${hash}`);
+    } else {
+      // Different page — navigate home, prevent Next.js auto-scroll, then jump
+      router.push(`/#${hash}`, { scroll: false });
+      jumpToHashAfterNav(hash);
     }
-    // if not on home, let Link navigate to /#fragment which will land on home+anchor
   }
 
   const isActive = (item: NavItem) => {

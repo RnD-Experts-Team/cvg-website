@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaChevronDown } from "react-icons/fa6";
@@ -30,20 +30,24 @@ interface ServicesSectionProps {
 const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSection, services: initialServices }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasScrollTriggered = useRef(false);
+  const prevHeightRef = useRef<number>(0);
 
   const [showMore, setShowMore] = useState(false);
   const [section, setSection] = useState<any>(initialSection ?? null);
   const [services, setServices] = useState<any[]>(initialServices ?? []);
 
-  // default show 4 services in the grid; toggle shows the rest
   // show 4 by default; when expanded show up to 8 cards max
   const visibleServices = showMore ? services.slice(0, 8) : services.slice(0, 4);
 
+  /* ── Toggle with height capture (prevents scroll jump) ── */
   const toggleShowMore = () => {
+    if (containerRef.current) {
+      prevHeightRef.current = containerRef.current.offsetHeight;
+    }
     setShowMore((prev) => !prev);
   };
 
-  // Initial scroll-triggered animation (plays once)
+  /* ── Initial scroll-triggered entrance (plays once) ── */
   useEffect(() => {
     const container = containerRef.current;
     if (!container || hasScrollTriggered.current) return;
@@ -77,28 +81,52 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSecti
     setServices(initialServices ?? []);
   }, [initialServices]);
 
-  // Animate newly revealed cards when "Show More" is toggled
-  useEffect(() => {
+  /* ── Smooth height + card animation on toggle ── */
+  useLayoutEffect(() => {
     if (!hasScrollTriggered.current) return;
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || prevHeightRef.current === 0) return;
 
-    const cards = container.querySelectorAll(".service-card");
-    if (!cards.length) return;
+    const prevH = prevHeightRef.current;
+    const nextH = container.scrollHeight;
+    prevHeightRef.current = 0;
 
-    gsap.killTweensOf(cards);
-
+    // Smoothly animate the grid container height so the button slides
+    container.style.overflow = "hidden";
     gsap.fromTo(
-      cards,
-      { autoAlpha: 0, y: 20 },
+      container,
+      { height: prevH },
       {
-        autoAlpha: 1,
-        y: 0,
-        stagger: 0.08,
-        duration: 0.45,
-        ease: "power3.out",
+        height: nextH,
+        duration: 0.5,
+        ease: "power2.inOut",
+        onComplete: () => {
+          container.style.height = "";
+          container.style.overflow = "";
+        },
       }
     );
+
+    if (showMore) {
+      // Stagger-reveal only the newly added cards
+      const wrappers = container.querySelectorAll(".service-card-wrap");
+      const newCards = Array.from(wrappers).slice(4);
+      if (newCards.length) {
+        gsap.fromTo(
+          newCards,
+          { autoAlpha: 0, y: 24, scale: 0.96 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            stagger: 0.09,
+            duration: 0.45,
+            ease: "power3.out",
+            delay: 0.12,
+          }
+        );
+      }
+    }
   }, [showMore]);
 
   return (
@@ -127,10 +155,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSecti
         {/* Services Grid */}
         <div
           ref={containerRef}
-          className="gap-[16px] flex justify-center items-start flex-wrap"
+          className="flex flex-wrap justify-center gap-4"
         >
           {visibleServices.map((service) => (
-            <ServiceCard key={service.id} service={service} />
+            <div key={service.id} className="service-card-wrap w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.75rem)] xl:w-[calc(25%-0.75rem)]">
+              <ServiceCard service={service} />
+            </div>
           ))}
         </div>
 
@@ -140,14 +170,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSecti
             <button
               onClick={toggleShowMore}
               aria-expanded={showMore}
-              suppressHydrationWarning
               className="bg-[#1E1E1E] border border-primary text-white px-6 py-3 rounded-[10px] flex items-center gap-2 hover:bg-gray-800 transition-colors"
             >
               <span>{showMore ? "Show Less" : "Show More"}</span>
 
               <FaChevronDown
                 size={20}
-                className={`transition-transform duration-200 text-[#F68620] ${
+                className={`transition-transform duration-300 text-[#F68620] ${
                   showMore ? "rotate-180" : ""
                 }`}
               />

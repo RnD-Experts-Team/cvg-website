@@ -1,10 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { NavItem, NavContact } from "./navbar.types";
+
+/**
+ * After cross-page navigation, wait for the target element to appear
+ * then jump to it INSTANTLY. Re-enforces scroll position multiple times
+ * to beat any race with Next.js scroll restoration.
+ */
+function jumpToHashAfterNav(hash: string, maxWait = 4000) {
+  const start = Date.now();
+  let scrollCount = 0;
+
+  const scrollTo = () => {
+    const el = document.getElementById(hash);
+    if (el) {
+      el.scrollIntoView({ behavior: "instant", block: "start" });
+      scrollCount++;
+      if (scrollCount < 5) {
+        requestAnimationFrame(scrollTo);
+      } else {
+        history.replaceState(null, "", `/#${hash}`);
+      }
+    } else if (Date.now() - start < maxWait) {
+      requestAnimationFrame(scrollTo);
+    }
+  };
+
+  requestAnimationFrame(scrollTo);
+}
 
 interface Props {
   items: NavItem[];
@@ -21,6 +49,7 @@ export default function NavbarMobile({
   setMenuOpen,
   pathname,
 }: Props) {
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,15 +81,18 @@ export default function NavbarMobile({
               key={item.id}
               href={item.link}
               onClick={(e) => {
-                // smooth same-page anchors; otherwise let Link navigate
-                if (item.link.includes("#") && pathname === "/") {
+                if (item.link.includes("#")) {
                   e.preventDefault();
                   const [, hash] = item.link.split("#");
-                  const el = document.getElementById(hash);
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  history.replaceState(null, "", `#${hash}`);
+                  if (pathname === "/") {
+                    const el = document.getElementById(hash);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    history.replaceState(null, "", `/#${hash}`);
+                  } else {
+                    router.push(`/#${hash}`, { scroll: false });
+                    jumpToHashAfterNav(hash);
+                  }
                 }
-
                 setMenuOpen(false);
               }}
               className={`text-lg ${
@@ -77,14 +109,18 @@ export default function NavbarMobile({
             <Link
               href={contact.link}
               onClick={(e) => {
-                if (contact.link.includes("#") && pathname === "/") {
+                if (contact.link.includes("#")) {
                   e.preventDefault();
                   const [, hash] = contact.link.split("#");
-                  const el = document.getElementById(hash);
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  history.replaceState(null, "", `#${hash}`);
+                  if (pathname === "/") {
+                    const el = document.getElementById(hash);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    history.replaceState(null, "", `/#${hash}`);
+                  } else {
+                    router.push(`/#${hash}`, { scroll: false });
+                    jumpToHashAfterNav(hash);
+                  }
                 }
-
                 setMenuOpen(false);
               }}
               className="bg-orange-500 text-white px-6 py-2 rounded-lg"
