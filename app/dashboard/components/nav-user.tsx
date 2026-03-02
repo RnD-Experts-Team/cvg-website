@@ -54,6 +54,7 @@ export function NavUser() {
       setLoading(false);
 
       Cookies.remove("auth_token");
+      try { localStorage.removeItem("auth_user"); } catch {}
       logout();
 
       router.replace("/login");
@@ -77,6 +78,7 @@ export function NavUser() {
                 </Avatar>
 
                 <div className="grid flex-1 text-left text-sm leading-tight">
+                 
                   <span className="truncate text-xs text-muted-foreground">
                     {user?.email ?? ""}
                   </span>
