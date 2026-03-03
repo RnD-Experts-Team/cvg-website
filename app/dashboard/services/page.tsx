@@ -42,9 +42,14 @@ export default function ServicesPage() {
     try {
       const serviceService = new ServiceService();
       const res = await serviceService.getServiceSection();
-      setServiceSection(res.data);
-      setServiceTitle(res.data.title || "");
-      setServiceDescription(res.data.description || "");
+      if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
+        setServiceSection(res.data);
+        setServiceTitle(res.data.title || "");
+        setServiceDescription(res.data.description || "");
+      } else {
+        console.warn('Service section data is invalid:', res.data);
+        toast.error("Service section data format is invalid");
+      }
     } catch (err: any) {
       toast.error(err?.message || "Failed to load service section");
     } finally {
@@ -57,8 +62,12 @@ export default function ServicesPage() {
       setLoading(true);
       const serviceService = new ServiceService();
       const res = await serviceService.getAllServices() as ApiResponse<Service[]>;
-      setServices(res.data ?? []);
+      console.log('API Response:', res);
+      console.log('res.data type:', typeof res.data);
+      console.log('Is array?', Array.isArray(res.data));
+      setServices(Array.isArray(res.data) ? res.data : []);
     } catch (err: any) {
+      console.error('Fetch services error:', err);
       toast.error(err?.message || "Failed to load services");
     } finally {
       setLoading(false);
