@@ -1,10 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	images: {
-		// allow loading images from the backend host used in API responses
-		domains: ["cvg.pnehomes.com"],
-		// if you later need more flexible matching, use `remotePatterns`
-	},
+  // Required for Docker standalone deployment
+  output: "standalone",
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "backend.cvg.construction",
+      },
+      // Legacy hostname kept for backwards compatibility
+      {
+        protocol: "https",
+        hostname: "cvg.pnehomes.com",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

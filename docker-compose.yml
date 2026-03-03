@@ -1,0 +1,27 @@
+networks:
+  cvg_network:
+    external: true
+    name: cvg_network
+
+services:
+  cvg_website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    image: cvg_website:latest
+    container_name: cvg_website
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - cvg_network
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
