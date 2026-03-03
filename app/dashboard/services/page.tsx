@@ -65,7 +65,24 @@ export default function ServicesPage() {
       console.log('API Response:', res);
       console.log('res.data type:', typeof res.data);
       console.log('Is array?', Array.isArray(res.data));
-      setServices(Array.isArray(res.data) ? res.data : []);
+      console.log('res.data keys:', res.data ? Object.keys(res.data) : 'null');
+      
+      // Handle different response structures
+      let servicesArray: Service[] = [];
+      if (Array.isArray(res.data)) {
+        servicesArray = res.data;
+      } else if (res.data && typeof res.data === 'object') {
+        // Check if data is wrapped in another property
+        if ('services' in res.data && Array.isArray((res.data as any).services)) {
+          servicesArray = (res.data as any).services;
+        } else if ('data' in res.data && Array.isArray((res.data as any).data)) {
+          servicesArray = (res.data as any).data;
+        } else {
+          console.warn('Unexpected services data structure:', res.data);
+        }
+      }
+      
+      setServices(servicesArray);
     } catch (err: any) {
       console.error('Fetch services error:', err);
       toast.error(err?.message || "Failed to load services");
