@@ -5,13 +5,10 @@ cd "$SCRIPT_DIR"
 
 echo "🚀 Deploying CVG Website..."
 
-# Load env for build args
+# Load .env (contains NEXT_PUBLIC_API_URL needed as Docker build arg)
 set -a; source .env; set +a
 
-# Pull latest code
-git pull origin master
-
-# Build new image (pass NEXT_PUBLIC_ vars as build args so they're baked in)
+# Build new image (NEXT_PUBLIC_* vars baked in at build time)
 docker compose build \
   --build-arg NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL}"
 

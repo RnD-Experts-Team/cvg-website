@@ -5,7 +5,7 @@ on:
     branches:
       - master
 
-# Only one deployment at a time
+# Only one deployment at a time — never cancel an in-progress deploy
 concurrency:
   group: production-deploy
   cancel-in-progress: false
@@ -20,7 +20,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      # Push code to server via rsync (server never needs GitHub credentials)
+      - name: Sync code to server
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: >-
+            -avz --delete
+            --exclude='.git'
+            --exclude='.env'
+            --exclude='node_modules'
+            --exclude='.next'
+            --exclude='.pnpm-store'
+          path: ./
+          remote_path: /srv/apps/cvg_website/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SERVER_SSH_KEY }}
+          remote_port: ${{ secrets.SERVER_PORT || 22 }}
+
+      # Build Docker image and restart container on the server
+      - name: Build & restart container
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -35,5 +54,6 @@ jobs:
       - name: Notify on failure
         if: failure()
         run: |
-          echo "::error::Deployment to production failed! Check the server logs."
-          echo "Run: docker logs cvg_website --tail=50"
+          echo "::error::Deployment failed! SSH into the server and check:"
+          echo "  docker logs cvg_website --tail=50"
+          echo "  tail -20 /var/log/nginx/cvg.construction.error.log"
