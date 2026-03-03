@@ -77,7 +77,7 @@ export default function Navbar({ data: serverData }: NavbarProps) {
           {data.contact && (
             <a
               href={data.contact.link}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg transition"
+              className="bg-[#F68620] hover:bg-orange-600 text-white px-5 py-2 rounded-lg transition"
             >
               {data.contact.label}
             </a>

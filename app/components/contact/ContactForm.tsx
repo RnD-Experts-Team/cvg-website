@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useScrollAnimation } from "@/app/lib/useScrollAnimation";
 import { toast } from "react-toastify";
+import { FaPhoneAlt } from "react-icons/fa";
 import type { HomePageData } from "@/app/lib/types/cms/home";
 
 type Props = {
@@ -26,6 +27,7 @@ const ContactForm: React.FC<Props> = ({ contact = null }) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [localContact, setLocalContact] = useState<Props['contact'] | null>(null);
+  const [footerPhone, setFooterPhone] = useState<string | null>(null);
 
   const endpointBase = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
   const endpoint = endpointBase ? `${endpointBase}/contact-submissions` : "/contact-submissions";
@@ -52,6 +54,28 @@ const ContactForm: React.FC<Props> = ({ contact = null }) => {
     fetchContact();
     return () => { mounted = false; };
   }, [contact, endpointBase]);
+
+  // Fetch footer phone number
+  useEffect(() => {
+    let mounted = true;
+    const fetchFooterPhone = async () => {
+      try {
+        const base = endpointBase;
+        if (!base) return;
+        const homeEndpoint = base.endsWith("/api") ? `${base}/home` : `${base}/api/home`;
+        const res = await fetch(homeEndpoint);
+        if (!res.ok) return;
+        const json = await res.json().catch(() => null);
+        const phone = json?.data?.footer?.contact?.phone ?? null;
+        if (mounted && phone) setFooterPhone(phone);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    fetchFooterPhone();
+    return () => { mounted = false; };
+  }, [endpointBase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +134,26 @@ const ContactForm: React.FC<Props> = ({ contact = null }) => {
         </div>
 
         <div className="max-w-[900px] mx-auto bg-[#EEEEEE] p-8 md:p-12 contact-animate">
+          {/* Call Us Banner */}
+          {footerPhone && (
+            <div className="mb-8 contact-animate">
+              <div className="flex items-center justify-center gap-3 md:gap-4">
+                <div className="bg-[#F68620] p-3 rounded-full flex-shrink-0">
+                  <FaPhoneAlt className="text-white text-lg md:text-xl" />
+                </div>
+                <div className="text-center md:text-left">
+                  <p className="text-[#1E1E1E] font-bold text-base md:text-lg mb-1">Call Us</p>
+                  <a 
+                    href={`tel:${footerPhone}`}
+                    className="text-[#1E1E1E] font-bold text-xl md:text-2xl hover:text-[#F68620] transition-colors duration-300 block"
+                  >
+                    {footerPhone}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-6">
               {error && <div className="text-red-600">{error}</div>}
