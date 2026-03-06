@@ -10,9 +10,14 @@ const http = new HttpClient({
 
 export const SiteMetadataService = {
   async get(): Promise<GetSiteMetadataResponse> {
-    return http.get<GetSiteMetadataResponse>(
-      "/admin/site-metadata"
-    );
+    try {
+      return await http.get<GetSiteMetadataResponse>(
+        "/admin/site-metadata"
+      );
+    } catch (error) {
+      console.error('SiteMetadataService.get() error:', error);
+      throw error;
+    }
   },
 
  async update(payload: FormData): Promise<UpdateSiteMetadataResponse> {

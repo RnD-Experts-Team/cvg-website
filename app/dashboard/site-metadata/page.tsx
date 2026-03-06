@@ -33,9 +33,18 @@ export default function SiteMetadataPage() {
     try {
       setLoading(true);
       const res = await SiteMetadataService.get();
+      console.log('Site metadata response:', res);
       setData(res.data);
     } catch (err: any) {
+      console.error('Site metadata fetch error:', err);
+      console.error('Error details:', {
+        message: err?.message,
+        status: err?.status,
+        details: err?.details
+      });
       toast.error(err?.message || "Failed to load site metadata");
+      // Set empty data to allow the page to render
+      setData(null);
     } finally {
       setLoading(false);
     }
