@@ -39,12 +39,13 @@ export class ServiceService {
   // Create a new service
   async createService(payload: CreateServiceRequest): Promise<ApiResponse<Service>> {
     const formData = new FormData();
-    formData.append('title', payload.title);
+    formData.append('title', payload.title || '');
     formData.append('description', payload.description);
     formData.append('content', payload.content || '');
     formData.append('featured', payload.featured ? '1' : '0');
-    formData.append('slug', payload.slug);
+    formData.append('slug', payload.slug || '');
     if (payload.image) formData.append('image', payload.image);
+    if (payload.icon) formData.append('icon', payload.icon);
     if (payload.alt_text) formData.append('alt_text', payload.alt_text);
     if (payload.image_title) formData.append('image_title', payload.image_title);
 
@@ -54,12 +55,13 @@ export class ServiceService {
   // Update an existing service
   async updateService(payload: UpdateServiceRequest): Promise<ApiResponse<Service>> {
     const formData = new FormData();
-    formData.append('title', payload.title);
+    formData.append('title', payload.title || '');
     formData.append('description', payload.description);
     formData.append('content', payload.content || '');
     formData.append('featured', payload.featured ? '1' : '0');
     formData.append('slug', payload.slug);
     if (payload.image) formData.append('image', payload.image);
+    if (payload.icon) formData.append('icon', payload.icon);
     if (payload.alt_text) formData.append('alt_text', payload.alt_text);
     if (payload.image_title) formData.append('image_title', payload.image_title);
 

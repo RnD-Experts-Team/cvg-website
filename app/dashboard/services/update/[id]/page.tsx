@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useRouter, useParams } from 'next/navigation';
 import { Service, UpdateServiceRequest } from '../../service';
 import { ServiceService } from '../../services.service';
@@ -18,7 +19,9 @@ const UpdateServicePage = () => {
   const [content, setContent] = useState('');
   const [slug, setSlug] = useState('');
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // For image preview
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [icon, setIcon] = useState<File | null>(null);
+  const [iconPreviewUrl, setIconPreviewUrl] = useState<string | null>(null);
   const [featured, setFeatured] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -46,6 +49,10 @@ const UpdateServicePage = () => {
           if (data.image) {
             setImagePreviewUrl(data.image.url);
           }
+          // Set icon preview for the current icon (if available)
+          if (data.url) {
+            setIconPreviewUrl(data.url);
+          }
         });
       }
     }
@@ -56,16 +63,25 @@ const UpdateServicePage = () => {
       const serviceService = new ServiceService();
       const payload: UpdateServiceRequest = {
         id: service.id,
-        title,
+        title: slug === service.slug ? null : title,
         description,
         content,
         slug,
         image,
+        icon,
         featured,
       };
       setSaving(true);
-      await serviceService.updateService(payload);
-      router.push('/dashboard/services');
+      try {
+        await serviceService.updateService(payload);
+        toast.success('Service updated');
+        router.push('/dashboard/services');
+      } catch (err: any) {
+        const details = err?.details ?? err?.message ?? 'Update failed';
+        toast.error(typeof details === 'string' ? details : JSON.stringify(details));
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -77,6 +93,17 @@ const UpdateServicePage = () => {
       setImagePreviewUrl(URL.createObjectURL(file));
     } else {
       setImagePreviewUrl(null);
+    }
+  };
+
+  // Handle icon file change and preview
+  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setIcon(file);
+    if (file) {
+      setIconPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setIconPreviewUrl(null);
     }
   };
 
@@ -166,20 +193,9 @@ const UpdateServicePage = () => {
               />
             </div>
 
-            {/* Service Slug Input */}
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="Enter Service Slug"
-              />
-            </div>
-
             {/* Service Image Input */}
             <div className="space-y-2">
-              <Label>Project Image</Label>
+              <Label>Service Image</Label>
               <Input
                 type="file"
                 accept="image/*"
@@ -194,6 +210,26 @@ const UpdateServicePage = () => {
                 />
               ) : (
                 <div className="text-sm text-muted-foreground">No image selected</div>
+              )}
+            </div>
+
+            {/* Service Icon Input */}
+            <div className="space-y-2">
+              <Label>Service Icon</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleIconChange}
+              />
+
+              {iconPreviewUrl ? (
+                <img
+                  src={iconPreviewUrl}
+                  alt="Icon Preview"
+                  className="h-12 w-12 rounded border object-contain"
+                />
+              ) : (
+                <div className="text-sm text-muted-foreground">No icon selected</div>
               )}
             </div>
 

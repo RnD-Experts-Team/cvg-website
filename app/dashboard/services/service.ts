@@ -30,11 +30,13 @@ export interface ApiResponse<T> {
 
 export type Service = {
   id: number;
-  title: string;
+  title: string | null;
   description: string;
   content: string | null;
   featured: boolean;
-  slug: string;
+  slug: string ;
+  icon_path: string | null;
+  url: string | null;
   image: {
     url: string; // Image URL
     alt_text: string;
@@ -45,24 +47,26 @@ export type Service = {
 };
 
 export type CreateServiceRequest = {
-  title: string;
+  title: string | null;
   description: string;
   content: string | null;
   featured: boolean;
-  slug: string;
+  slug?: string | null;
   image: File | null;
+  icon: File | null;
   alt_text?: string;
   image_title?: string;
 };
 
 export type UpdateServiceRequest = {
   id: number;
-  title: string;
+  title: string | null;
   description: string;
   content: string | null;
   featured: boolean;
-  slug: string;
+  slug: string ;
   image: File | null;
+  icon: File | null;
   alt_text?: string;
   image_title?: string;
 };

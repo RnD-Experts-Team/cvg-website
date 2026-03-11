@@ -15,11 +15,12 @@ const CreateServicePage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
-  const [slug, setSlug] = useState('');
   const [image, setImage] = useState<File | null>(null);
+  const [icon, setIcon] = useState<File | null>(null);
   const [featured, setFeatured] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // For image preview
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [iconPreviewUrl, setIconPreviewUrl] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -30,8 +31,8 @@ const CreateServicePage = () => {
       title,
       description,
       content,
-      slug,
       image,
+      icon,
       featured,
       alt_text: title,
       image_title: title,
@@ -56,6 +57,17 @@ const CreateServicePage = () => {
       setImagePreviewUrl(URL.createObjectURL(file));
     } else {
       setImagePreviewUrl(null);
+    }
+  };
+
+  // Handle icon file change and preview
+  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setIcon(file);
+    if (file) {
+      setIconPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setIconPreviewUrl(null);
     }
   };
 
@@ -101,20 +113,9 @@ const CreateServicePage = () => {
               />
             </div>
 
-            {/* Service Slug Input */}
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="Enter Service Slug"
-              />
-            </div>
-
             {/* Service Image Input */}
             <div className="space-y-2">
-              <Label>Project Image</Label>
+              <Label>Service Image</Label>
               <Input
                 type="file"
                 accept="image/*"
@@ -132,9 +133,29 @@ const CreateServicePage = () => {
               )}
             </div>
 
+            {/* Service Icon Input */}
+            <div className="space-y-2">
+              <Label>Service Icon</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleIconChange}
+              />
+
+              {iconPreviewUrl ? (
+                <img
+                  src={iconPreviewUrl}
+                  alt="Icon Preview"
+                  className="h-12 w-12 rounded border object-contain"
+                />
+              ) : (
+                <div className="text-sm text-muted-foreground">No icon selected</div>
+              )}
+            </div>
+
             {/* Submit Button */}
             <Button onClick={handleSubmit} className="w-full">
-              {saving ? "Creating..." : "Create Project"}
+              {saving ? "Creating..." : "Create Service"}
             </Button>
           </div>
         </CardContent>

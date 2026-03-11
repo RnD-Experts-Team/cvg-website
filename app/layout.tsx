@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </>
         )}
       </head>
-      <body className={`antialiased ${poppins.className}`}>
+      <body className={`antialiased ${poppins.className}`} suppressHydrationWarning>
         {children}
         <ToastProvider />
       </body>
