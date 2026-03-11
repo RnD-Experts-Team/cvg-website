@@ -211,6 +211,7 @@ export default function ServicesPage() {
                     <th className="px-4 py-2 text-left">Title</th>
                     <th className="px-4 py-2 text-left">Description</th>
                     <th className="px-4 py-2 text-left">Image</th>
+                    <th className="px-4 py-2 text-left">Icon</th>
                     <th className="px-4 py-2 text-left">Slug</th>
                     <th className="px-4 py-2 text-center">Action</th>
                   </tr>
@@ -221,6 +222,7 @@ export default function ServicesPage() {
                       <td className="px-4 py-2"><Skeleton className="h-4 w-40" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-4 w-56" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-12 w-12 rounded" /></td>
+                      <td className="px-4 py-2"><Skeleton className="h-10 w-10 rounded" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-4 w-24" /></td>
                       <td className="text-center"><Skeleton className="h-8 w-20 mx-auto" /></td>
                     </tr>
@@ -236,6 +238,7 @@ export default function ServicesPage() {
                     <th className="px-4 py-2 text-left">Title</th>
                     <th className="px-4 py-2 text-left">Description</th>
                     <th className="px-4 py-2 text-left">Image</th>
+                    <th className="px-4 py-2 text-left">Icon</th>
                     <th className="px-4 py-2 text-left">Slug</th>
                     <th className="px-4 py-2 text-center">Action</th>
                   </tr>
@@ -249,11 +252,22 @@ export default function ServicesPage() {
                         {service.image ? (
                           <img
                             src={service.image.url || "/placeholder.png"}
-                            alt={service.title}
+                            alt={service.title || "Service image"}
                             className="w-16 h-16 object-cover rounded"
                           />
                         ) : (
                           "No Image"
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        {service.url ? (
+                          <img
+                            src={service.url}
+                            alt={`${service.title} icon`}
+                            className="w-10 h-10 object-contain rounded"
+                          />
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No Icon</span>
                         )}
                       </td>
                       <td className="px-4 py-2">{service.slug}</td>

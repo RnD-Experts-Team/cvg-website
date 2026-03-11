@@ -201,6 +201,8 @@ export interface ServiceItem {
   content?: string | null;
   featured?: boolean;
   slug?: string | null;
+  icon_path?: string | null;
+  url?: string | null;
   created_at?: string;
   updated_at?: string;
   image?: MediaItem | null;

@@ -16,18 +16,19 @@ interface ServiceCardProps {
 
 const ServiceCard = forwardRef<HTMLDivElement, ServiceCardProps>(
   ({ service }, ref) => {
-    
+    const iconUrl = service?.url?.replace('http://', 'https://') ?? null;
+
     return (
       <div
         ref={ref}
-        className="service-card bg-[#F68620] rounded-[10px] w-full px-6 pt-10 pb-12 flex flex-col items-center text-center min-h-[320px] justify-between hover:-translate-y-2 transition-transform duration-300"
+        className="service-card bg-[#F68620] rounded-[10px] w-full h-full px-6 pt-10 pb-12 flex flex-col items-center text-center min-h-[320px] justify-between hover:-translate-y-2 transition-transform duration-300"
       >
         <div className="mt-4">
-          {service?.image?.url ? (
+          {iconUrl ? (
             <img
-              src={service.image.url}
-              alt={service.image.title ?? service.title ?? "Service image"}
-              className="w-[51px] h-[51px] object-cover rounded-md mx-auto mb-[16px]"
+              src={iconUrl}
+              alt={service?.title ?? "Service icon"}
+              className="w-[51px] h-[51px] object-contain mx-auto mb-[16px]"
             />
           ) : (
             <IoMdMusicalNote size={51} className="text-[#F8F8F8] mx-auto mb-[16px]" />
