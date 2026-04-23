@@ -104,9 +104,14 @@ export default function EditProjectPage() {
       setCategories(categoriesRes.data);
 
       setForm({
-        title: projectData.title,
-        description: projectData.description,
-        content: projectData.content,
+        title: projectData.title ?? "",
+        description: projectData.description ?? "",
+        // Coerce null/undefined and the legacy literal string "null" (caused by an earlier
+        // FormData bug) to an empty string so the rich text editor initializes cleanly.
+        content:
+          projectData.content == null || projectData.content === "null"
+            ? ""
+            : projectData.content,
         category_id: String(projectData.category?.id || ""),
       });
 
@@ -193,7 +198,7 @@ export default function EditProjectPage() {
       const fd = new FormData();
       fd.append("title", form.title);
       fd.append("description", form.description);
-      fd.append("content", form.content);
+      fd.append("content", form.content ?? "");
       fd.append("featured", project?.featured ? "1" : "0");
       fd.append("category_id", form.category_id);
 

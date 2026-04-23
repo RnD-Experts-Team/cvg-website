@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Star, Image as ImageIcon, Video, Pencil, Trash2 } from "lucide-react";
 
 import { ProjectsService } from "./projects.service";
 import type { Project } from "./projects";
@@ -14,6 +14,15 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Label } from "../components/ui/label";
 import { Skeleton } from "../components/ui/skeleton";
+import { Badge } from "../components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 
 import {
   DropdownMenu,
@@ -214,119 +223,191 @@ export default function ProjectsPage() {
 
         <CardContent>
           {loading ? (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="p-3">Title</th>
-                    <th className="p-3">Description</th>
-                    <th className="p-3">Content</th>
-                    <th className="p-3">Category</th>
-                    <th className="p-3">Image</th>
-                    <th className="p-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from({ length: 5 }).map((_, idx) => (
-                    <tr key={idx} className="border-b">
-                      <td className="p-3 font-medium"><Skeleton className="h-4 w-40" /></td>
-                      <td className="p-3"><Skeleton className="h-4 w-48" /></td>
-                      <td className="p-3"><Skeleton className="h-4 w-56" /></td>
-                      <td className="p-3"><Skeleton className="h-4 w-32" /></td>
-                      <td className="p-3"><Skeleton className="h-12 w-12 rounded" /></td>
-                      <td className="p-3 text-right"><Skeleton className="h-8 w-20 mx-auto" /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">Preview</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Content</TableHead>
+                  <TableHead className="text-center">Media</TableHead>
+                  <TableHead className="text-center">Featured</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell><Skeleton className="h-12 w-12 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-56" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : projects.length === 0 ? (
+            <div className="py-12 text-center text-sm text-muted-foreground">
+              No projects yet. Click <span className="font-medium">Create Project</span> to add one.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="p-3">Title</th>
-                    <th className="p-3">Description</th>
-                    <th className="p-3">Content</th>
-                    <th className="p-3">Category</th>
-                    <th className="p-3">Image</th>
-                    <th className="p-3 text-right">Action</th>
-                  </tr>
-                </thead>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">Preview</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead className="max-w-[260px]">Description</TableHead>
+                  <TableHead className="max-w-[260px]">Content</TableHead>
+                  <TableHead className="text-center">Media</TableHead>
+                  <TableHead className="text-center">Featured</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {projects.map((project) => {
+                  const firstMedia: any = project.images?.[0];
+                  const firstUrl =
+                    firstMedia?.url || firstMedia?.media?.url || "";
+                  const firstIsVideo =
+                    firstMedia?.type === "video" ||
+                    (typeof firstMedia?.mime_type === "string" &&
+                      firstMedia.mime_type.startsWith("video/")) ||
+                    (typeof firstMedia?.media?.mime_type === "string" &&
+                      firstMedia.media.mime_type.startsWith("video/"));
+                  const totalMedia = project.images?.length ?? 0;
+                  const videoCount = (project.images ?? []).filter(
+                    (i: any) =>
+                      i?.type === "video" ||
+                      (typeof i?.mime_type === "string" &&
+                        i.mime_type.startsWith("video/")),
+                  ).length;
+                  const imageCount = totalMedia - videoCount;
 
-                <tbody>
-                  {projects.map((project) => (
-                    <tr
-                      key={project.id}
-                      className="border-b hover:bg-muted/50"
-                    >
-                      <td className="p-3 font-medium">
-                        {project.title}
-                      </td>
+                  // Strip HTML for plain-text preview of content
+                  const contentPlain = (project.content || "")
+                    .replace(/<[^>]*>/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
 
-                      <td className="p-3">
-                        {project.description}
-                      </td>
-
-                      <td className="p-3">
-                        {project.content}
-                      </td>
-
-                      <td className="p-3">
-                        {project.category?.title || "—"}
-                      </td>
-
-                      <td className="p-3">
-                        {project.images?.length ? (
-                          <img
-                            src={
-                              (project.images[0] as any)?.url ||
-                              (project.images[0] as any)?.media?.url ||
-                              ""
-                            }
-                            alt="project"
-                            className="w-16 h-16 object-cover rounded border"
-                          />
+                  return (
+                    <TableRow key={project.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        {firstUrl ? (
+                          firstIsVideo ? (
+                            <div className="relative h-12 w-12">
+                              <video
+                                src={firstUrl}
+                                muted
+                                playsInline
+                                preload="metadata"
+                                className="h-12 w-12 rounded border object-cover bg-black"
+                              />
+                              <Video className="absolute bottom-0 right-0 h-3 w-3 text-white drop-shadow" />
+                            </div>
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={firstUrl}
+                              alt={project.title}
+                              className="h-12 w-12 rounded border object-cover"
+                            />
+                          )
                         ) : (
-                          "—"
+                          <div className="h-12 w-12 rounded border bg-muted flex items-center justify-center text-muted-foreground">
+                            <ImageIcon className="h-5 w-5" />
+                          </div>
                         )}
-                      </td>
+                      </TableCell>
 
-                      <td className="p-3 text-right">
+                      <TableCell className="font-medium">
+                        <div className="flex flex-col">
+                          <span>{project.title}</span>
+                          {project.slug && (
+                            <span className="text-xs text-muted-foreground">
+                              /{project.slug}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        {project.category?.title ? (
+                          <Badge variant="secondary">{project.category.title}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell className="max-w-[260px]">
+                        <span className="line-clamp-2 text-sm text-muted-foreground">
+                          {project.description || "—"}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="max-w-[260px]">
+                        <span className="line-clamp-2 text-sm text-muted-foreground">
+                          {contentPlain || "—"}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2 text-xs">
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
+                            <ImageIcon className="h-3.5 w-3.5" />
+                            {imageCount}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
+                            <Video className="h-3.5 w-3.5" />
+                            {videoCount}
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        {project.featured ? (
+                          <Star className="inline h-4 w-4 fill-amber-400 text-amber-500" />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="w-5 h-5" />
+                            <Button variant="ghost" size="icon" aria-label="Actions">
+                              <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
                               onClick={() =>
-                                router.push(
-                                  `/dashboard/projects/edit/${project.id}`
-                                )
+                                router.push(`/dashboard/projects/edit/${project.id}`)
                               }
                             >
-                              Update
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() =>
-                                openDeleteDialog(project)
-                              }
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => openDeleteDialog(project)}
                             >
-                              Delete
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

@@ -121,7 +121,7 @@ export default function CreateProjectPage() {
       const fd = new FormData();
       fd.append("title", title);
       fd.append("description", description);
-      fd.append("content", content);
+      fd.append("content", content ?? "");
       fd.append("featured", "1");
       fd.append("category_id", categoryId);
 
