@@ -67,6 +67,7 @@ export default function EditProjectPage() {
 
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [removedExistingIds, setRemovedExistingIds] = useState<number[]>([]);
+  const [editorInitialHtml, setEditorInitialHtml] = useState("");
 
   const [form, setForm] = useState({
     title: "",
@@ -100,18 +101,19 @@ export default function EditProjectPage() {
       ]);
 
       const projectData = projectRes.data;
+      const normalizedContent =
+        projectData.content == null || projectData.content === "null"
+          ? ""
+          : projectData.content;
+
       setProject(projectData);
       setCategories(categoriesRes.data);
+      setEditorInitialHtml(normalizedContent);
 
       setForm({
         title: projectData.title ?? "",
         description: projectData.description ?? "",
-        // Coerce null/undefined and the legacy literal string "null" (caused by an earlier
-        // FormData bug) to an empty string so the rich text editor initializes cleanly.
-        content:
-          projectData.content == null || projectData.content === "null"
-            ? ""
-            : projectData.content,
+        content: normalizedContent,
         category_id: String(projectData.category?.id || ""),
       });
 
@@ -292,8 +294,10 @@ export default function EditProjectPage() {
           <div>
             <Label>Content</Label>
             <RichTextEditor
-              initialHtml={form.content}
-              onChange={(html) => setForm({ ...form, content: html })}
+              initialHtml={editorInitialHtml}
+              onChange={(html) =>
+                setForm((prev) => ({ ...prev, content: html }))
+              }
             />
           </div>
 

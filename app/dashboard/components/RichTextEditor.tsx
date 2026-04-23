@@ -5,6 +5,7 @@ import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
@@ -72,7 +73,15 @@ function HtmlInitializerPlugin({ html }: { html: string }) {
       const dom = parser.parseFromString(html, "text/html");
       const nodes = $generateNodesFromDOM(editor, dom);
       const root = $getRoot();
+
       root.clear();
+
+      if (nodes.length === 0) {
+        root.append($createParagraphNode());
+        return;
+      }
+
+      root.select();
       $insertNodes(nodes);
     });
 
@@ -331,10 +340,8 @@ function EditorContentEditable() {
     <div className="relative min-h-[200px] px-3 py-3 sm:px-4 sm:py-4">
       <RichTextPlugin
         contentEditable={
-          <div
+          <ContentEditable
             className="editor-shell prose prose-sm sm:prose max-w-none focus:outline-none min-h-[180px]"
-            contentEditable
-            suppressContentEditableWarning
           />
         }
         ErrorBoundary={LexicalErrorBoundary}
