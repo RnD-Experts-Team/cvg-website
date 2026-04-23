@@ -15,6 +15,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, className }) => {
   const imageUrl = firstImage
     ? ensureHttps(firstImage.media?.url || firstImage.url || (firstImage.media?.path ? `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')}/storage/${firstImage.media.path}` : ""))
     : "";
+  const isVideo = !!firstImage && (
+    firstImage.type === "video" ||
+    (typeof firstImage.mime_type === "string" && firstImage.mime_type.startsWith("video/")) ||
+    (typeof firstImage.media?.mime_type === "string" && firstImage.media.mime_type.startsWith("video/"))
+  );
   const title = project.title;
   const description = project.description ?? undefined;
   const id = project.id;
@@ -24,11 +29,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, className }) => {
     >
       <div className="aspect-[4/3] overflow-hidden bg-gray-100">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+          isVideo ? (
+            <video
+              src={imageUrl}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="metadata"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 bg-black"
+            />
+          ) : (
+            <img
+              src={imageUrl}
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
             <span className="px-4 text-center">No image available</span>

@@ -41,15 +41,25 @@ export class HttpClient {
       (res) => res,
       (error: AxiosError) => {
         const status = error.response?.status ?? 0;
-        const details = error.response?.data ?? {
+        const details: any = error.response?.data ?? {
           message: error.message,
         };
 
-        throw new HttpError(
-          `HTTP ${status || "ERR"} for ${error.config?.url}`,
-          status,
-          details
-        );
+        // Build a user-friendly message that includes validation field errors
+        let message = `HTTP ${status || "ERR"} for ${error.config?.url}`;
+        if (status === 422 && details?.errors && typeof details.errors === "object") {
+          const fieldMsgs = Object.entries(details.errors)
+            .map(([field, msgs]) => {
+              const list = Array.isArray(msgs) ? msgs : [String(msgs)];
+              return `${field}: ${list.join(", ")}`;
+            })
+            .join(" | ");
+          message = `${details.message || "Validation Error"} — ${fieldMsgs}`;
+        } else if (details?.message) {
+          message = `${details.message} (HTTP ${status})`;
+        }
+
+        throw new HttpError(message, status, details);
       }
     );
   }

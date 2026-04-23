@@ -8,9 +8,15 @@ export interface Category {
 export interface ProjectImage {
   id?: number;
   url?: string;
+  path?: string;
   alt_text?: string;
   title?: string;
   sort_order?: number;
+  width?: number | null;
+  height?: number | null;
+  /** "image" | "video" | "file" — server-detected media bucket */
+  type?: "image" | "video" | "file";
+  mime_type?: string | null;
 }
 
 export interface Project {
