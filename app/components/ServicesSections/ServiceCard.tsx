@@ -5,10 +5,10 @@ import { IoMdMusicalNote } from "react-icons/io";
 
 interface ServiceCardProps {
   service: Partial<ServiceItem> & {
-    title?: string;
-    description?: string;
-    content?: string;
-    slug?: string;
+    title?: string | null;
+    description?: string | null;
+    content?: string | null;
+    slug?: string | null;
     image?: any;
     icon?: any;
   };
