@@ -1,16 +1,68 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FaChevronDown } from "react-icons/fa6";
 
 import ServiceCard from "./ServiceCard";
+import ServiceCategoryCard from "./ServiceCategoryCard";
 import { ServiceItem, MediaItem } from "@/app/lib/types/cms/home";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+/* ── Static data ──────────────────────────────────────────────────────── */
+
+type CategoryKey = "general" | "design";
+
+const CATEGORIES: { key: CategoryKey; title: string; description: string }[] = [
+  {
+    key: "general",
+    title: "General Construction",
+    description:
+      "Commercial build-outs, renovations, and fit-outs across restaurants, cafes, and retail spaces delivered on time.",
+  },
+  {
+    key: "design",
+    title: "Design Services",
+    description:
+      "Interior design, architectural drafting, 3D visualization, and space planning to bring your vision to life.",
+  },
+];
+
+const DESIGN_MOCK_SERVICES: ServiceItem[] = [
+  {
+    id: 9901,
+    title: "Interior Design",
+    description:
+      "Full interior space planning and material selection for high-impact commercial environments.",
+    slug: "interior-design",
+  },
+  {
+    id: 9902,
+    title: "Architectural Drafting",
+    description:
+      "Detailed architectural plans and technical drawings prepared for permits and construction.",
+    slug: "architectural-drafting",
+  },
+  {
+    id: 9903,
+    title: "3D Visualization",
+    description:
+      "Photorealistic renders that let you experience your space before a single wall goes up.",
+    slug: "3d-visualization",
+  },
+  {
+    id: 9904,
+    title: "Space Planning",
+    description:
+      "Optimized floor plan layouts that maximize traffic flow and operational efficiency.",
+    slug: "space-planning",
+  },
+];
+
+/* ── Component ────────────────────────────────────────────────────────── */
 
 interface ServicesSectionProps {
   section?: {
@@ -27,162 +79,212 @@ interface ServicesSectionProps {
   services?: ServiceItem[];
 }
 
-const ServicesSection: React.FC<ServicesSectionProps> = ({ section: initialSection, services: initialServices }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const hasScrollTriggered = useRef(false);
-  const prevHeightRef = useRef<number>(0);
+const ServicesSection: React.FC<ServicesSectionProps> = ({
+  section: initialSection,
+  services: initialServices,
+}) => {
+  const [section, setSection] = useState(initialSection ?? null);
+  const [generalServices, setGeneralServices] = useState<ServiceItem[]>(
+    initialServices ?? []
+  );
+  const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
 
-  const [showMore, setShowMore] = useState(false);
-  const [section, setSection] = useState<any>(initialSection ?? null);
-  const [services, setServices] = useState<any[]>(initialServices ?? []);
+  const sectionRef     = useRef<HTMLElement>(null);
+  const categoryRowRef = useRef<HTMLDivElement>(null);
+  const subSectionRef  = useRef<HTMLDivElement>(null);
+  const subGridRef     = useRef<HTMLDivElement>(null);
+  const isAnimating    = useRef(false);
 
-  // show 4 by default; when expanded show up to 8 cards max
-  const visibleServices = showMore ? services.slice(0, 8) : services.slice(0, 4);
+  /* Keep in sync if parent updates props */
+  useEffect(() => { setSection(initialSection ?? null); }, [initialSection]);
+  useEffect(() => { setGeneralServices(initialServices ?? []); }, [initialServices]);
 
-  /* ── Toggle with height capture (prevents scroll jump) ── */
-  const toggleShowMore = () => {
-    if (containerRef.current) {
-      prevHeightRef.current = containerRef.current.offsetHeight;
-    }
-    setShowMore((prev) => !prev);
-  };
-
-  /* ── Initial scroll-triggered entrance (plays once) ── */
+  /* ── Scroll-triggered entrance for category cards ─────────────────── */
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container || hasScrollTriggered.current) return;
+    const row = categoryRowRef.current;
+    if (!row) return;
 
-    const cards = container.querySelectorAll(".service-card");
+    const cards = row.querySelectorAll(".service-category-card");
     if (!cards.length) return;
 
     gsap.set(cards, { autoAlpha: 0, y: 40 });
 
-    gsap.to(cards, {
-      autoAlpha: 1,
-      y: 0,
-      stagger: 0.1,
-      duration: 0.7,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: container,
-        start: "top 85%",
-        toggleActions: "play none none none",
-        onEnter: () => { hasScrollTriggered.current = true; },
+    const st = ScrollTrigger.create({
+      trigger: row,
+      start: "top 85%",
+      once: true,
+      onEnter: () => {
+        gsap.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.7,
+          ease: "power3.out",
+        });
       },
     });
+
+    return () => st.kill();
   }, []);
 
-  // If props change after hydration, update state
-  useEffect(() => {
-    setSection(initialSection ?? null);
-  }, [initialSection]);
+  /* ── Category select / toggle ─────────────────────────────────────── */
+  const handleCategorySelect = (key: CategoryKey) => {
+    if (isAnimating.current) return;
 
-  useEffect(() => {
-    setServices(initialServices ?? []);
-  }, [initialServices]);
+    const sub = subSectionRef.current;
+    if (!sub) return;
 
-  /* ── Smooth height + card animation on toggle ── */
-  useLayoutEffect(() => {
-    if (!hasScrollTriggered.current) return;
-    const container = containerRef.current;
-    if (!container || prevHeightRef.current === 0) return;
-
-    const prevH = prevHeightRef.current;
-    const nextH = container.scrollHeight;
-    prevHeightRef.current = 0;
-
-    // Smoothly animate the grid container height so the button slides
-    container.style.overflow = "hidden";
-    gsap.fromTo(
-      container,
-      { height: prevH },
-      {
-        height: nextH,
-        duration: 0.5,
+    /* Toggle off if same category clicked */
+    if (activeCategory === key) {
+      isAnimating.current = true;
+      gsap.to(sub, {
+        height: 0,
+        autoAlpha: 0,
+        duration: 0.35,
         ease: "power2.inOut",
         onComplete: () => {
-          container.style.height = "";
-          container.style.overflow = "";
+          setActiveCategory(null);
+          isAnimating.current = false;
         },
-      }
-    );
+      });
+      return;
+    }
 
-    if (showMore) {
-      // Stagger-reveal only the newly added cards
-      const wrappers = container.querySelectorAll(".service-card-wrap");
-      const newCards = Array.from(wrappers).slice(4);
-      if (newCards.length) {
+    const openPanel = () => {
+      setActiveCategory(key);
+      /* Wait a tick for React to render the new cards */
+      requestAnimationFrame(() => {
+        if (!subSectionRef.current || !subGridRef.current) return;
+
+        const subCards = subGridRef.current.querySelectorAll(".service-card-wrap");
+
+        gsap.set(sub, { height: 0, autoAlpha: 0 });
         gsap.fromTo(
-          newCards,
-          { autoAlpha: 0, y: 24, scale: 0.96 },
+          sub,
+          { height: 0, autoAlpha: 0 },
           {
+            height: "auto",
             autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            stagger: 0.09,
-            duration: 0.45,
-            ease: "power3.out",
-            delay: 0.12,
+            duration: 0.5,
+            ease: "power2.inOut",
+            onComplete: () => {
+              sub.style.height = "";
+              isAnimating.current = false;
+            },
           }
         );
-      }
-    }
-  }, [showMore]);
 
+        if (subCards.length) {
+          gsap.fromTo(
+            subCards,
+            { autoAlpha: 0, y: 24, scale: 0.96 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              stagger: 0.09,
+              duration: 0.45,
+              ease: "power3.out",
+              delay: 0.2,
+            }
+          );
+        }
+      });
+    };
+
+    /* If already open, collapse first then switch */
+    if (activeCategory !== null) {
+      isAnimating.current = true;
+      gsap.to(sub, {
+        height: 0,
+        autoAlpha: 0,
+        duration: 0.25,
+        ease: "power2.inOut",
+        onComplete: openPanel,
+      });
+    } else {
+      isAnimating.current = true;
+      openPanel();
+    }
+  };
+
+  /* ── Derived data ─────────────────────────────────────────────────── */
+  const activeServices: ServiceItem[] =
+    activeCategory === "design"
+      ? DESIGN_MOCK_SERVICES
+      : generalServices.slice(0, 4);
+
+  const activeCategoryData = CATEGORIES.find((c) => c.key === activeCategory);
+
+  /* ── Render ───────────────────────────────────────────────────────── */
   return (
-    <section id="services" className="relative py-20">
-      {/* Background Image */}
+    <section ref={sectionRef} id="services" className="relative py-20">
+      {/* Background */}
       <img
-        src={section?.image?.url ?? '/img/bgService.png'}
+        src={section?.image?.url ?? "/img/bgService.png"}
         alt="Services background"
         className="absolute inset-0 w-full h-full object-cover"
       />
-
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/0"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/0" />
 
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-20">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#1E1E1E] mb-4">
-            {section?.title ?? 'Our Services'}
+            {section?.title ?? "Our Services"}
           </h2>
           <p className="text-[#1E1E1E] max-w-3xl mx-auto">
-            {section?.description ?? 'We offer a range of services to support your needs.'}
+            {section?.description ?? "We offer a range of services to support your needs."}
           </p>
         </div>
 
-        {/* Services Grid */}
+        {/* Category cards row */}
         <div
-          ref={containerRef}
-          className="flex flex-wrap justify-center gap-4"
+          ref={categoryRowRef}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto"
         >
-          {visibleServices.map((service) => (
-            <div key={service.id} className="service-card-wrap w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.75rem)] xl:w-[calc(25%-0.75rem)]">
-              <ServiceCard service={service} />
-            </div>
+          {CATEGORIES.map((cat) => (
+            <ServiceCategoryCard
+              key={cat.key}
+              categoryKey={cat.key}
+              title={cat.title}
+              description={cat.description}
+              isActive={activeCategory === cat.key}
+              onSelect={() => handleCategorySelect(cat.key)}
+            />
           ))}
         </div>
 
-        {/* Show More / Show Less */}
-        {services.length > 4 && (
-          <div className="mt-12 flex justify-center">
-            <button
-              onClick={toggleShowMore}
-              aria-expanded={showMore}
-              className="bg-[#1E1E1E] border border-primary text-white px-6 py-3 rounded-[10px] flex items-center gap-2 hover:bg-gray-800 transition-colors"
-            >
-              <span>{showMore ? "Show Less" : "Show More"}</span>
+        {/* Expandable sub-section */}
+        <div
+          ref={subSectionRef}
+          className="overflow-hidden mt-10"
+          style={{ height: 0, opacity: 0 }}
+        >
+          {/* Sub-header */}
+          {activeCategoryData && (
+            <div className="text-center mb-10">
+              <h3 className="text-2xl sm:text-3xl font-bold text-[#1E1E1E] mb-3">
+                {activeCategoryData.title}
+              </h3>
+              <p className="text-[#1E1E1E] max-w-2xl mx-auto text-sm sm:text-base">
+                {activeCategoryData.description}
+              </p>
+            </div>
+          )}
 
-              <FaChevronDown
-                size={20}
-                className={`transition-transform duration-300 text-[#F68620] ${
-                  showMore ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+          {/* Sub-cards grid */}
+          <div
+            ref={subGridRef}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            {activeServices.map((svc) => (
+              <div key={svc.id} className="service-card-wrap">
+                <ServiceCard service={svc} />
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

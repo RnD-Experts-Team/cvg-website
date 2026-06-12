@@ -3,13 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FaChevronDown } from "react-icons/fa6";
 import { NavItem, NavContact } from "./navbar.types";
 
-/**
- * After cross-page navigation, wait for the target element to appear
- * then jump to it INSTANTLY. Re-enforces scroll position multiple times
- * to beat any race with Next.js scroll restoration.
- */
 function jumpToHashAfterNav(hash: string, maxWait = 4000) {
   const start = Date.now();
   let scrollCount = 0;
@@ -19,7 +15,6 @@ function jumpToHashAfterNav(hash: string, maxWait = 4000) {
     if (el) {
       el.scrollIntoView({ behavior: "instant", block: "start" });
       scrollCount++;
-      // Re-enforce a few times to beat any async scroll-to-top from Next.js
       if (scrollCount < 5) {
         requestAnimationFrame(scrollTo);
       } else {
@@ -53,17 +48,24 @@ export default function NavbarLinks({ items, contact, pathname }: Props) {
 
   function handleAnchorClick(e: React.MouseEvent<HTMLAnchorElement>, link: string) {
     if (!link.includes("#")) return;
-
     const [, hash] = link.split("#");
     e.preventDefault();
-
     if (pathname === "/") {
-      // Same page — smooth scroll directly
       const el = document.getElementById(hash);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       history.replaceState(null, "", `/#${hash}`);
     } else {
-      // Different page — navigate home, prevent Next.js auto-scroll, then jump
+      router.push(`/#${hash}`, { scroll: false });
+      jumpToHashAfterNav(hash);
+    }
+  }
+
+  function scrollToHash(hash: string) {
+    if (pathname === "/") {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", `/#${hash}`);
+    } else {
       router.push(`/#${hash}`, { scroll: false });
       jumpToHashAfterNav(hash);
     }
@@ -79,31 +81,67 @@ export default function NavbarLinks({ items, contact, pathname }: Props) {
 
   return (
     <nav className="hidden lg:flex items-center gap-8">
-      {items.map((item) => (
-        <Link
-          key={item.id}
-          href={item.link}
-          onClick={(e) => handleAnchorClick(e as any, item.link)}
-          className={`relative font-medium transition ${
-            isActive(item)
-              ? "text-orange-500"
-              : "text-gray-800 hover:text-orange-500"
-          }`}
-        >
-          {item.label}
-        </Link>
-      ))}
+      {items.map((item) => {
+        /* ── Services dropdown ── */
+        if (item.label === "Services") {
+          const servicesActive =
+            pathname === "/" && currentHash === "#services";
 
-      {/* contact button (if configured)
-      {contact && (
-        <Link
-          href={contact.link}
-          onClick={(e) => contact.link.includes("#") && handleAnchorClick(e as any, contact.link)}
-          className={`ml-6 px-4 py-2 rounded-lg font-medium bg-orange-500 text-white hover:bg-orange-600 transition`}
-        >
-          {contact.label}
-        </Link>
-      )} */}
+          return (
+            <div key={item.id} className="relative group">
+              {/* Trigger button — dropdown opens on hover; click does nothing */}
+              <button
+                type="button"
+                className={`relative font-medium transition flex items-center gap-1 ${
+                  servicesActive
+                    ? "text-orange-500"
+                    : "text-gray-800 hover:text-orange-500"
+                }`}
+              >
+                {item.label}
+                <FaChevronDown
+                  size={11}
+                  className="mt-0.5 transition-transform duration-300 group-hover:rotate-180"
+                />
+              </button>
+
+              {/* Dropdown panel */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50">
+                <div className="bg-white shadow-xl rounded-xl py-2 min-w-[160px] border border-gray-100">
+                  <button
+                    onClick={() => router.push("/services?category=general")}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
+                  >
+                    General
+                  </button>
+                  <button
+                    onClick={() => router.push("/services?category=design")}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
+                  >
+                    Design
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        /* ── Regular link ── */
+        return (
+          <Link
+            key={item.id}
+            href={item.link}
+            onClick={(e) => handleAnchorClick(e as any, item.link)}
+            className={`relative font-medium transition ${
+              isActive(item)
+                ? "text-orange-500"
+                : "text-gray-800 hover:text-orange-500"
+            }`}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
-} 
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProjectCard from "@/app/components/ProjectSections/ProjectCard";
@@ -25,46 +25,66 @@ export default function ProjectsClient({
   headerDescription,
   contact = null,
 }: ProjectsClientProps) {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef  = useRef<HTMLDivElement>(null);
+  const gridRef    = useRef<HTMLDivElement>(null);
 
-  /* ── Entrance Animation ─────────────────────────────────────────── */
+  /* ── ScrollTrigger animations (matches ProjectsSection.tsx style) ── */
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
+      /* Header: slide up + fade */
       if (headerRef.current) {
-        gsap.set(headerRef.current, { autoAlpha: 0, y: -30 });
-        tl.to(headerRef.current, { autoAlpha: 1, y: 0, duration: 0.7 });
+        gsap.set(headerRef.current, { autoAlpha: 0, y: 40 });
+        ScrollTrigger.create({
+          trigger: headerRef.current,
+          start: "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.to(headerRef.current!, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power3.out",
+            });
+          },
+        });
       }
 
+      /* Cards: staggered scale + slide + fade */
       if (gridRef.current) {
         const cards = gridRef.current.querySelectorAll(".project-card");
-        gsap.set(cards, { autoAlpha: 0, y: 50, scale: 0.96 });
-        tl.to(
-          cards,
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            stagger: { amount: 0.5, from: "start" },
-            duration: 0.6,
-          },
-          "-=0.2",
-        );
+        if (cards.length) {
+          gsap.set(cards, { autoAlpha: 0, y: 60, scale: 0.92 });
+          ScrollTrigger.create({
+            trigger: gridRef.current,
+            start: "top 85%",
+            once: true,
+            onEnter: () => {
+              gsap.to(cards, {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                stagger: { amount: 0.6, from: "start" },
+                duration: 0.7,
+                ease: "back.out(1.4)",
+              });
+            },
+          });
+        }
       }
-    });
+    }, sectionRef);
 
     return () => ctx.revert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [projects]);
 
   /* ── Render ─────────────────────────────────────────────────────── */
 
   return (
-    <section className="bg-[#F8F8F8] min-h-screen pt-32 sm:pt-36 md:pt-40 ">
+    <section ref={sectionRef} className="bg-[#F8F8F8] min-h-screen pt-32 sm:pt-36 md:pt-40">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
         {/* ── Header ────────────────────────────────────────────── */}
         <div ref={headerRef} className="mb-10 md:mb-14 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#191919] mb-4 leading-tight">
@@ -80,17 +100,15 @@ export default function ProjectsClient({
         {/* ── Grid ──────────────────────────────────────────────── */}
         <div
           ref={gridRef}
-          className="flex flex-wrap justify-center gap-5 sm:gap-6 md:gap-8"
+          className="flex flex-wrap justify-center gap-4 sm:gap-5 md:gap-6"
         >
           {projects.map((project) => (
-            <div
-              key={project.id}
-              className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-22px)]"
-            >
+            <div key={project.id} className="w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-16px)]">
               <ProjectCard project={project} />
             </div>
           ))}
         </div>
+
       </div>
 
       {/* ── Contact Form ──────────────────────────────────────── */}

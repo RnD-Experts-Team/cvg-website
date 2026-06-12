@@ -13,6 +13,7 @@ interface Props {
   initialTitle?: string;
   sectionImage?: MediaItem | null;
   initialPagination?: any;
+  category?: "general" | "design";
 }
 
 if (typeof window !== "undefined") {
@@ -23,6 +24,7 @@ export default function ServicesClient({
   initialServices,
   initialTitle,
   initialPagination,
+  category = "general",
 }: Props) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const itemsRef = useRef<HTMLDivElement>(null);
@@ -141,7 +143,9 @@ export default function ServicesClient({
     pagination?.total_records ??
     services.length;
 
-  const showPagination = Boolean(pagination && lastPage > 1 && totalServicesCount >= 5);
+  const showPagination =
+    category !== "design" &&
+    Boolean(pagination && lastPage > 1 && totalServicesCount >= 5);
 
   return (
     <section className="bg-[#F8F8F8] pt-50 ">

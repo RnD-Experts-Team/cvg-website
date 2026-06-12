@@ -3,15 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useEffect, useRef } from "react";
+import { FaChevronDown } from "react-icons/fa6";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { NavItem, NavContact } from "./navbar.types";
 
-/**
- * After cross-page navigation, wait for the target element to appear
- * then jump to it INSTANTLY. Re-enforces scroll position multiple times
- * to beat any race with Next.js scroll restoration.
- */
 function jumpToHashAfterNav(hash: string, maxWait = 4000) {
   const start = Date.now();
   let scrollCount = 0;
@@ -50,17 +46,44 @@ export default function NavbarMobile({
   pathname,
 }: Props) {
   const router = useRouter();
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef        = useRef<HTMLDivElement>(null);
+  const servicesSubRef = useRef<HTMLDivElement>(null);
+  const [servicesOpen, setServicesOpen] = useState(false);
 
+  /* ── Main menu open/close ─────────────────────────────────────────── */
   useEffect(() => {
     if (!menuRef.current) return;
-
     if (menuOpen) {
       gsap.to(menuRef.current, { height: "auto", opacity: 1, duration: 0.4 });
     } else {
       gsap.to(menuRef.current, { height: 0, opacity: 0, duration: 0.3 });
+      /* Close services sub-menu when main menu closes */
+      setServicesOpen(false);
     }
   }, [menuOpen]);
+
+  /* ── Services sub-accordion ───────────────────────────────────────── */
+  useEffect(() => {
+    if (!servicesSubRef.current) return;
+    if (servicesOpen) {
+      gsap.to(servicesSubRef.current, { height: "auto", opacity: 1, duration: 0.3 });
+    } else {
+      gsap.to(servicesSubRef.current, { height: 0, opacity: 0, duration: 0.25 });
+    }
+  }, [servicesOpen]);
+
+  function handleHashNav(hash: string) {
+    if (pathname === "/") {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", `/#${hash}`);
+    } else {
+      router.push(`/#${hash}`, { scroll: false });
+      jumpToHashAfterNav(hash);
+    }
+    setMenuOpen(false);
+    setServicesOpen(false);
+  }
 
   return (
     <>
@@ -76,34 +99,70 @@ export default function NavbarMobile({
         className="lg:hidden overflow-hidden h-0 opacity-0 bg-white shadow-md absolute left-0 right-0 top-full"
       >
         <div className="flex flex-col items-center gap-6 py-6">
-          {items.map((item) => (
-            <Link
-              key={item.id}
-              href={item.link}
-              onClick={(e) => {
-                if (item.link.includes("#")) {
-                  e.preventDefault();
-                  const [, hash] = item.link.split("#");
-                  if (pathname === "/") {
-                    const el = document.getElementById(hash);
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    history.replaceState(null, "", `/#${hash}`);
+          {items.map((item) => {
+            /* ── Services accordion item ── */
+            if (item.label === "Services") {
+              return (
+                <div key={item.id} className="flex flex-col items-center gap-2 w-full px-6">
+                  <button
+                    onClick={() => setServicesOpen((p) => !p)}
+                    className="text-lg text-gray-800 flex items-center gap-1.5"
+                  >
+                    Services
+                    <FaChevronDown
+                      size={13}
+                      className={`transition-transform duration-300 ${
+                        servicesOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Sub-items */}
+                  <div
+                    ref={servicesSubRef}
+                    className="overflow-hidden h-0 opacity-0 flex flex-col items-center gap-3 w-full"
+                  >
+                    <div className="pt-2 flex flex-col items-center gap-3 w-full">
+                      <button
+                        onClick={() => { router.push("/services?category=general"); setMenuOpen(false); setServicesOpen(false); }}
+                        className="text-base text-gray-600 hover:text-orange-500 transition-colors"
+                      >
+                        General
+                      </button>
+                      <button
+                        onClick={() => { router.push("/services?category=design"); setMenuOpen(false); setServicesOpen(false); }}
+                        className="text-base text-gray-600 hover:text-orange-500 transition-colors"
+                      >
+                        Design
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            /* ── Regular link ── */
+            return (
+              <Link
+                key={item.id}
+                href={item.link}
+                onClick={(e) => {
+                  if (item.link.includes("#")) {
+                    e.preventDefault();
+                    const [, hash] = item.link.split("#");
+                    handleHashNav(hash);
                   } else {
-                    router.push(`/#${hash}`, { scroll: false });
-                    jumpToHashAfterNav(hash);
+                    setMenuOpen(false);
                   }
-                }
-                setMenuOpen(false);
-              }}
-              className={`text-lg ${
-                pathname === item.link
-                  ? "text-orange-500"
-                  : "text-gray-800"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+                }}
+                className={`text-lg ${
+                  pathname === item.link ? "text-orange-500" : "text-gray-800"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
 
           {contact && (
             <Link
@@ -112,16 +171,10 @@ export default function NavbarMobile({
                 if (contact.link.includes("#")) {
                   e.preventDefault();
                   const [, hash] = contact.link.split("#");
-                  if (pathname === "/") {
-                    const el = document.getElementById(hash);
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    history.replaceState(null, "", `/#${hash}`);
-                  } else {
-                    router.push(`/#${hash}`, { scroll: false });
-                    jumpToHashAfterNav(hash);
-                  }
+                  handleHashNav(hash);
+                } else {
+                  setMenuOpen(false);
                 }
-                setMenuOpen(false);
               }}
               className="bg-orange-500 text-white px-6 py-2 rounded-lg"
             >
