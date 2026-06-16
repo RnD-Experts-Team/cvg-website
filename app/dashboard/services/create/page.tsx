@@ -5,16 +5,18 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { ServiceService } from '../services.service';
 import { CreateServiceRequest } from '../service';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'; 
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 
 const CreateServicePage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
+  const [type, setType] = useState<'general' | 'design'>('general');
   const [image, setImage] = useState<File | null>(null);
   const [icon, setIcon] = useState<File | null>(null);
   const [featured, setFeatured] = useState(true);
@@ -31,6 +33,7 @@ const CreateServicePage = () => {
       title,
       description,
       content,
+      type,
       image,
       icon,
       featured,
@@ -89,6 +92,20 @@ const CreateServicePage = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter Service Title"
               />
+            </div>
+
+            {/* Service Type Select */}
+            <div className="space-y-2">
+              <Label htmlFor="type">Service Type</Label>
+              <Select value={type} onValueChange={(v) => setType(v as 'general' | 'design')}>
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="design">Design</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Service Description Textarea */}

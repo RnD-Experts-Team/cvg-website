@@ -5,12 +5,13 @@ import { toast } from 'react-toastify';
 import { useRouter, useParams } from 'next/navigation';
 import { Service, UpdateServiceRequest } from '../../service';
 import { ServiceService } from '../../services.service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/dashboard/components/ui/card'; 
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/dashboard/components/ui/card';
 import { Input } from '@/app/dashboard/components/ui/input';
 import { Textarea } from '@/app/dashboard/components/ui/textarea';
 import { Button } from '@/app/dashboard/components/ui/button';
 import { Label } from '@/app/dashboard/components/ui/label';
 import { Skeleton } from '@/app/dashboard/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/dashboard/components/ui/select';
 
 const UpdateServicePage = () => {
   const [service, setService] = useState<Service | null>(null);
@@ -18,6 +19,7 @@ const UpdateServicePage = () => {
   const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
   const [slug, setSlug] = useState('');
+  const [type, setType] = useState<'general' | 'design'>('general');
   const [image, setImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [icon, setIcon] = useState<File | null>(null);
@@ -43,6 +45,7 @@ const UpdateServicePage = () => {
           setDescription(data.description || '');
           setContent(data.content || '');
           setSlug(data.slug || '');
+          setType(data.type ?? 'general');
           setFeatured(data.featured ?? true);
 
           // Set image preview for the current image (if available)
@@ -66,6 +69,7 @@ const UpdateServicePage = () => {
         title: slug === service.slug ? null : title,
         description,
         content,
+        type,
         slug,
         image,
         icon,
@@ -169,6 +173,20 @@ const UpdateServicePage = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter Service Title"
               />
+            </div>
+
+            {/* Service Type Select */}
+            <div className="space-y-2">
+              <Label htmlFor="type">Service Type</Label>
+              <Select value={type} onValueChange={(v) => setType(v as 'general' | 'design')}>
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="design">Design</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Service Description Textarea */}

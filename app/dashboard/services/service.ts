@@ -35,6 +35,7 @@ export type Service = {
   content: string | null;
   featured: boolean;
   slug: string ;
+  type: 'general' | 'design';
   icon_path: string | null;
   url: string | null;
   image: {
@@ -51,6 +52,7 @@ export type CreateServiceRequest = {
   description: string;
   content: string | null;
   featured: boolean;
+  type?: 'general' | 'design';
   slug?: string | null;
   image: File | null;
   icon: File | null;
@@ -64,6 +66,7 @@ export type UpdateServiceRequest = {
   description: string;
   content: string | null;
   featured: boolean;
+  type?: 'general' | 'design';
   slug: string ;
   image: File | null;
   icon: File | null;

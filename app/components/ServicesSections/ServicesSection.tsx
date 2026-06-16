@@ -31,37 +31,6 @@ const CATEGORIES: { key: CategoryKey; title: string; description: string }[] = [
   },
 ];
 
-const DESIGN_MOCK_SERVICES: ServiceItem[] = [
-  {
-    id: 9901,
-    title: "Interior Design",
-    description:
-      "Full interior space planning and material selection for high-impact commercial environments.",
-    slug: "interior-design",
-  },
-  {
-    id: 9902,
-    title: "Architectural Drafting",
-    description:
-      "Detailed architectural plans and technical drawings prepared for permits and construction.",
-    slug: "architectural-drafting",
-  },
-  {
-    id: 9903,
-    title: "3D Visualization",
-    description:
-      "Photorealistic renders that let you experience your space before a single wall goes up.",
-    slug: "3d-visualization",
-  },
-  {
-    id: 9904,
-    title: "Space Planning",
-    description:
-      "Optimized floor plan layouts that maximize traffic flow and operational efficiency.",
-    slug: "space-planning",
-  },
-];
-
 /* ── Component ────────────────────────────────────────────────────────── */
 
 interface ServicesSectionProps {
@@ -88,6 +57,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     initialServices ?? []
   );
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
+  const [designServices, setDesignServices] = useState<ServiceItem[]>([]);
+  const [loadingDesign, setLoadingDesign] = useState(false);
 
   const sectionRef     = useRef<HTMLElement>(null);
   const categoryRowRef = useRef<HTMLDivElement>(null);
@@ -130,6 +101,23 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   /* ── Category select / toggle ─────────────────────────────────────── */
   const handleCategorySelect = (key: CategoryKey) => {
     if (isAnimating.current) return;
+
+    if (key === "design" && designServices.length === 0 && !loadingDesign) {
+      setLoadingDesign(true);
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+      const endpoint = apiBase.endsWith("/api")
+        ? `${apiBase}/services?type=design`
+        : `${apiBase}/api/services?type=design`;
+      fetch(endpoint)
+        .then((r) => r.json())
+        .then((json) => {
+          const items: ServiceItem[] =
+            json.data?.services?.data ?? json.data?.services ?? [];
+          setDesignServices(items);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingDesign(false));
+    }
 
     const sub = subSectionRef.current;
     if (!sub) return;
@@ -211,7 +199,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   /* ── Derived data ─────────────────────────────────────────────────── */
   const activeServices: ServiceItem[] =
     activeCategory === "design"
-      ? DESIGN_MOCK_SERVICES
+      ? designServices
       : generalServices.slice(0, 4);
 
   const activeCategoryData = CATEGORIES.find((c) => c.key === activeCategory);

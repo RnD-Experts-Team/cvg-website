@@ -205,10 +205,12 @@ export async function getServicesListFromApi(): Promise<ServiceItem[]> {
 }
 
 // Fetch a paginated services response (returns the services pagination object)
-export async function getServicesPage(page: number = 1): Promise<any> {
+export async function getServicesPage(page: number = 1, type?: string): Promise<any> {
   const base = API_BASE.replace(/\/$/, '');
   const endpointBase = base.endsWith('/api') ? `${base}/services` : `${base}/api/services`;
-  const endpoint = `${endpointBase}?page=${page}`;
+  const params = new URLSearchParams({ page: String(page) });
+  if (type) params.set('type', type);
+  const endpoint = `${endpointBase}?${params}`;
 
   const res = await fetch(endpoint, { next: { revalidate: 600 } });
   if (!res.ok) throw new Error(`Failed to fetch services page ${page}: ${res.status}`);
