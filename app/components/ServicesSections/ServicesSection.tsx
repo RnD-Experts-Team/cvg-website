@@ -6,30 +6,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import ServiceCard from "./ServiceCard";
 import ServiceCategoryCard from "./ServiceCategoryCard";
-import { ServiceItem, MediaItem } from "@/app/lib/types/cms/home";
+import { ServiceItem, MediaItem, ServiceCategoryContent, DEFAULT_SERVICE_CATEGORIES } from "@/app/lib/types/cms/home";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-/* ── Static data ──────────────────────────────────────────────────────── */
+/* ── Types ────────────────────────────────────────────────────────────── */
 
 type CategoryKey = "general" | "design";
-
-const CATEGORIES: { key: CategoryKey; title: string; description: string }[] = [
-  {
-    key: "general",
-    title: "General Construction",
-    description:
-      "Commercial build-outs, renovations, and fit-outs across restaurants, cafes, and retail spaces delivered on time.",
-  },
-  {
-    key: "design",
-    title: "Design Services",
-    description:
-      "Interior design, architectural drafting, 3D visualization, and space planning to bring your vision to life.",
-  },
-];
 
 /* ── Component ────────────────────────────────────────────────────────── */
 
@@ -46,13 +31,19 @@ interface ServicesSectionProps {
     image?: MediaItem | null;
   } | null;
   services?: ServiceItem[];
+  categories?: ServiceCategoryContent[];
 }
 
 const ServicesSection: React.FC<ServicesSectionProps> = ({
   section: initialSection,
   services: initialServices,
+  categories: initialCategories,
 }) => {
   const [section, setSection] = useState(initialSection ?? null);
+  const CATEGORIES =
+    initialCategories && initialCategories.length
+      ? initialCategories
+      : DEFAULT_SERVICE_CATEGORIES;
   const [generalServices, setGeneralServices] = useState<ServiceItem[]>(
     initialServices ?? []
   );
@@ -234,11 +225,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           {CATEGORIES.map((cat) => (
             <ServiceCategoryCard
               key={cat.key}
-              categoryKey={cat.key}
-              title={cat.title}
-              description={cat.description}
+              categoryKey={cat.key as CategoryKey}
+              title={cat.title ?? ""}
+              description={cat.description ?? ""}
+              iconUrl={cat.url}
               isActive={activeCategory === cat.key}
-              onSelect={() => handleCategorySelect(cat.key)}
+              onSelect={() => handleCategorySelect(cat.key as CategoryKey)}
             />
           ))}
         </div>
@@ -253,10 +245,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           {activeCategoryData && (
             <div className="text-center mb-10">
               <h3 className="text-2xl sm:text-3xl font-bold text-[#1E1E1E] mb-3">
-                {activeCategoryData.title}
+                {activeCategoryData.title ?? ""}
               </h3>
               <p className="text-[#1E1E1E] max-w-2xl mx-auto text-sm sm:text-base">
-                {activeCategoryData.description}
+                {activeCategoryData.description ?? ""}
               </p>
             </div>
           )}

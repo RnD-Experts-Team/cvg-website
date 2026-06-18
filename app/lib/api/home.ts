@@ -1,7 +1,7 @@
 // lib/api/home.ts
 
-import { HomePageData } from "../types/cms/home";
-import type { ProjectItem, CategoryItem, ServiceItem, MediaItem } from "../types/cms/home";
+import { HomePageData, DEFAULT_SERVICE_CATEGORIES } from "../types/cms/home";
+import type { ProjectItem, CategoryItem, ServiceItem, MediaItem, ServiceCategoryContent } from "../types/cms/home";
 import { parseJsonHttps } from "../utils/ensure-https";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -212,10 +212,45 @@ export async function getServicesPage(page: number = 1, type?: string): Promise<
   if (type) params.set('type', type);
   const endpoint = `${endpointBase}?${params}`;
 
-  const res = await fetch(endpoint, { next: { revalidate: 600 } });
+  const res = await fetch(endpoint, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to fetch services page ${page}: ${res.status}`);
   const json = await parseJsonHttps<any>(res);
 
   // return the paginated services object (json.data.services)
   return json.data?.services ?? json.data;
+}
+
+/**
+ * Fetch the admin-managed content for the two service category cards
+ * (General / Design): title, description and icon. Falls back to
+ * DEFAULT_SERVICE_CATEGORIES if the endpoint is unavailable.
+ */
+export async function getServiceCategories(): Promise<ServiceCategoryContent[]> {
+  const base = API_BASE.replace(/\/$/, '');
+  const endpoint = base.endsWith('/api')
+    ? `${base}/service-categories`
+    : `${base}/api/service-categories`;
+
+  try {
+    const res = await fetch(endpoint, { next: { revalidate: 600 } });
+    if (!res.ok) return DEFAULT_SERVICE_CATEGORIES;
+    const json = await parseJsonHttps<any>(res);
+    const list: ServiceCategoryContent[] = json.data ?? json ?? [];
+    if (!Array.isArray(list) || list.length === 0) return DEFAULT_SERVICE_CATEGORIES;
+
+    // Merge API values over defaults so a missing field never blanks a card.
+    return DEFAULT_SERVICE_CATEGORIES.map((def) => {
+      const match = list.find((c) => c?.key === def.key);
+      return match
+        ? {
+            ...def,
+            ...match,
+            title: match.title || def.title,
+            description: match.description || def.description,
+          }
+        : def;
+    });
+  } catch {
+    return DEFAULT_SERVICE_CATEGORIES;
+  }
 }

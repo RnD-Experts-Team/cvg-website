@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { MoreHorizontal } from "lucide-react";
 import { ServiceService } from "./services.service";
 import { Service, ServiceSectionData, ApiResponse } from "./service";
+import ServiceCategoriesManager from "./ServiceCategoriesManager";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -195,6 +196,9 @@ export default function ServicesPage() {
         </CardContent>
       </Card>
 
+      {/* Service Category Cards (General / Design) */}
+      <ServiceCategoriesManager />
+
       {/* Service List Table */}
       <Card>
         <CardHeader className="flex flex-row justify-between">
@@ -209,6 +213,7 @@ export default function ServicesPage() {
                 <thead>
                   <tr>
                     <th className="px-4 py-2 text-left">Title</th>
+                    <th className="px-4 py-2 text-left">Type</th>
                     <th className="px-4 py-2 text-left">Description</th>
                     <th className="px-4 py-2 text-left">Image</th>
                     <th className="px-4 py-2 text-left">Icon</th>
@@ -220,6 +225,7 @@ export default function ServicesPage() {
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <tr key={idx} className="border-b">
                       <td className="px-4 py-2"><Skeleton className="h-4 w-40" /></td>
+                      <td className="px-4 py-2"><Skeleton className="h-5 w-16 rounded-full" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-4 w-56" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-12 w-12 rounded" /></td>
                       <td className="px-4 py-2"><Skeleton className="h-10 w-10 rounded" /></td>
@@ -236,6 +242,7 @@ export default function ServicesPage() {
                 <thead>
                   <tr>
                     <th className="px-4 py-2 text-left">Title</th>
+                    <th className="px-4 py-2 text-left">Type</th>
                     <th className="px-4 py-2 text-left">Description</th>
                     <th className="px-4 py-2 text-left">Image</th>
                     <th className="px-4 py-2 text-left">Icon</th>
@@ -247,6 +254,15 @@ export default function ServicesPage() {
                   {services.map((service) => (
                     <tr key={service.id}>
                       <td className="px-4 py-2">{service.title}</td>
+                      <td className="px-4 py-2">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                          service.type === 'design'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {service.type === 'design' ? 'Design' : 'General'}
+                        </span>
+                      </td>
                       <td className="px-4 py-2">{service.description}</td>
                       <td className="px-4 py-2">
                         {service.image ? (

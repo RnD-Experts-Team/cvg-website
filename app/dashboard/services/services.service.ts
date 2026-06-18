@@ -1,6 +1,6 @@
 import { getAuthToken } from '@/app/lib/http/auth';
 import { HttpClient } from '@/app/lib/http/http-client';
-import { ApiResponse, CreateServiceRequest, Service, ServiceSection, UpdateServiceRequest } from './service';
+import { ApiResponse, CreateServiceRequest, Service, ServiceCategory, ServiceSection, UpdateServiceCategoryRequest, UpdateServiceRequest } from './service';
 
 export class ServiceService {
   private client: HttpClient;
@@ -43,6 +43,7 @@ export class ServiceService {
     formData.append('description', payload.description);
     formData.append('content', payload.content || '');
     formData.append('featured', payload.featured ? '1' : '0');
+    formData.append('type', payload.type || 'general');
     formData.append('slug', payload.slug || '');
     if (payload.image) formData.append('image', payload.image);
     if (payload.icon) formData.append('icon', payload.icon);
@@ -59,6 +60,7 @@ export class ServiceService {
     formData.append('description', payload.description);
     formData.append('content', payload.content || '');
     formData.append('featured', payload.featured ? '1' : '0');
+    formData.append('type', payload.type || 'general');
     formData.append('slug', payload.slug);
     if (payload.image) formData.append('image', payload.image);
     if (payload.icon) formData.append('icon', payload.icon);
@@ -71,5 +73,25 @@ export class ServiceService {
   // Delete a service
   async deleteService(id: number): Promise<void> {
     return this.client.delete<void>(`/admin/services/${id}`);
+  }
+
+  // ── Service Categories (General / Design card content) ──────────────────
+
+  // Fetch both service category cards
+  async getServiceCategories(): Promise<ApiResponse<ServiceCategory[]>> {
+    return this.client.get<ApiResponse<ServiceCategory[]>>('/admin/service-categories');
+  }
+
+  // Update a single service category card (title, description, icon)
+  async updateServiceCategory(payload: UpdateServiceCategoryRequest): Promise<ApiResponse<ServiceCategory>> {
+    const formData = new FormData();
+    formData.append('title', payload.title || '');
+    formData.append('description', payload.description || '');
+    if (payload.icon) formData.append('icon', payload.icon);
+
+    return this.client.post<ApiResponse<ServiceCategory>>(
+      `/admin/service-categories/${payload.id}`,
+      formData,
+    );
   }
 }

@@ -1,5 +1,5 @@
 import ServicesClient from "./ServicesClient";
-import { getServicesSectionFromHome, getServicesPage } from "../../lib/api/home";
+import { getServicesSectionFromHome, getServicesPage, getServiceCategories } from "../../lib/api/home";
 
 export default async function ServicesPage({
   searchParams,
@@ -9,29 +9,46 @@ export default async function ServicesPage({
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
   const category = params?.category === "design" ? "design" : "general";
 
-  const servicesSection = await getServicesSectionFromHome();
+  const [servicesSection, serviceCategories] = await Promise.all([
+    getServicesSectionFromHome(),
+    getServiceCategories(),
+  ]);
+
+  // Admin-managed content for the active category card (title + description).
+  const categoryContent = serviceCategories.find((c) => c.key === category);
 
   if (category === "design") {
     const servicesPage = await getServicesPage(1, "design");
-    const servicesList = servicesPage?.data ?? servicesPage ?? [];
+    const raw: any[] = servicesPage?.data ?? servicesPage ?? [];
+    const servicesList = (Array.isArray(raw) ? raw : []).filter(
+      (s: any) => s?.type === "design"
+    );
     return (
       <ServicesClient
         initialServices={servicesList}
-        initialTitle="Design Services"
+        initialTitle={categoryContent?.title || "Design Services"}
+        initialDescription={categoryContent?.description ?? ""}
         initialPagination={servicesPage}
         category="design"
       />
     );
   }
 
-  const servicesPage = await getServicesPage(1);
-  const servicesList = servicesPage?.data ?? servicesPage ?? [];
-  const title = servicesSection?.services_section?.title ?? "Our Services";
+  const servicesPage = await getServicesPage(1, "general");
+  const raw: any[] = servicesPage?.data ?? servicesPage ?? [];
+  const servicesList = (Array.isArray(raw) ? raw : []).filter(
+    (s: any) => !s?.type || s?.type === "general"
+  );
+  const title =
+    categoryContent?.title ||
+    servicesSection?.services_section?.title ||
+    "Our Services";
 
   return (
     <ServicesClient
       initialServices={servicesList}
       initialTitle={title}
+      initialDescription={categoryContent?.description ?? ""}
       initialPagination={servicesPage}
       category="general"
     />

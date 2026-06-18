@@ -7,6 +7,8 @@ interface ServiceCategoryCardProps {
   categoryKey: "general" | "design";
   title: string;
   description: string;
+  /** Admin-managed icon URL; falls back to the built-in icon when absent. */
+  iconUrl?: string | null;
   isActive: boolean;
   onSelect: () => void;
 }
@@ -20,10 +22,12 @@ const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
   categoryKey,
   title,
   description,
+  iconUrl,
   isActive,
   onSelect,
 }) => {
   const Icon = ICONS[categoryKey];
+  const resolvedIcon = iconUrl?.replace("http://", "https://") ?? null;
 
   return (
     <div
@@ -32,7 +36,15 @@ const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
       }`}
     >
       <div className="mt-2">
-        <Icon size={52} className="text-white mx-auto mb-4" />
+        {resolvedIcon ? (
+          <img
+            src={resolvedIcon}
+            alt={`${title} icon`}
+            className="w-[52px] h-[52px] object-contain mx-auto mb-4"
+          />
+        ) : (
+          <Icon size={52} className="text-white mx-auto mb-4" />
+        )}
         <h3 className="text-white font-bold text-xl mb-3">{title}</h3>
         <p className="text-white/90 text-sm leading-relaxed">{description}</p>
       </div>

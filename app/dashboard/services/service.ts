@@ -47,6 +47,27 @@ export type Service = {
   updated_at: string;
 };
 
+// ── Service Category card content (General / Design) ─────────────────────
+// Admin-managed title, description and icon for the two category cards shown
+// on the homepage Services section and the /services?category=... pages.
+export type ServiceCategory = {
+  id: number;
+  key: 'general' | 'design';
+  title: string | null;
+  description: string | null;
+  icon_path: string | null;
+  url: string | null; // absolute icon URL appended by the backend
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type UpdateServiceCategoryRequest = {
+  id: number;
+  title: string | null;
+  description: string | null;
+  icon: File | null;
+};
+
 export type CreateServiceRequest = {
   title: string | null;
   description: string;

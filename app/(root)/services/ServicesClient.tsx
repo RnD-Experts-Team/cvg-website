@@ -11,6 +11,7 @@ import { GrNext, GrPrevious } from "react-icons/gr";
 interface Props {
   initialServices: ServiceItem[];
   initialTitle?: string;
+  initialDescription?: string;
   sectionImage?: MediaItem | null;
   initialPagination?: any;
   category?: "general" | "design";
@@ -23,6 +24,7 @@ if (typeof window !== "undefined") {
 export default function ServicesClient({
   initialServices,
   initialTitle,
+  initialDescription,
   initialPagination,
   category = "general",
 }: Props) {
@@ -37,6 +39,23 @@ export default function ServicesClient({
   );
   const [lastPage, setLastPage] = useState<number>(pagination?.last_page ?? 1);
   const [title, setTitle] = useState<string>(initialTitle ?? "Our Services");
+  const [description, setDescription] = useState<string>(
+    initialDescription ?? "",
+  );
+
+  /* Re-sync state when the category changes via the navbar dropdown.
+     The /services route segment is reused across ?category=general and
+     ?category=design, so the server component re-runs and streams new props
+     but this client component is NOT remounted — without this effect the
+     useState initializers never re-run and the page appears not to refresh. */
+  useEffect(() => {
+    setServices(initialServices ?? []);
+    setPagination(initialPagination ?? null);
+    setCurrentPage(initialPagination?.current_page ?? 1);
+    setLastPage(initialPagination?.last_page ?? 1);
+    setTitle(initialTitle ?? "Our Services");
+    setDescription(initialDescription ?? "");
+  }, [category, initialServices, initialPagination, initialTitle, initialDescription]);
 
   useEffect(() => {
     if (!titleRef.current) return;
@@ -110,7 +129,8 @@ export default function ServicesClient({
       const endpointBase = base.endsWith("/api")
         ? `${base}/services`
         : `${base}/api/services`;
-      const endpoint = `${endpointBase}?page=${page}`;
+      const typeParam = category === 'design' ? '&type=design' : '&type=general';
+      const endpoint = `${endpointBase}?page=${page}${typeParam}`;
 
       const res = await fetch(endpoint);
       if (!res.ok)
@@ -152,10 +172,18 @@ export default function ServicesClient({
       <div className="max-w-[1200px] xl:max-w-[1440px] mx-auto">
         <h1
           ref={titleRef}
-          className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#1E1E1E] mb-14 lg:mb-20"
+          className={`text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#1E1E1E] ${
+            description ? "mb-5" : "mb-14 lg:mb-20"
+          }`}
         >
           {title}
         </h1>
+
+        {description && (
+          <p className="text-base md:text-lg text-[#555] text-center max-w-3xl mx-auto mb-14 lg:mb-20 px-5">
+            {description}
+          </p>
+        )}
 
         <div ref={itemsRef} className="flex flex-col gap-16 lg:gap-24">
           {services.map((service) => {

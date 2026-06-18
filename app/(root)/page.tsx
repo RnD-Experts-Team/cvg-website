@@ -5,16 +5,17 @@ import ProcessSection from "../components/process/ProcessSection";
 import ProjectsSection from "../components/ProjectSections/ProjectsSection";
 import ServicesSection from "../components/ServicesSections/ServicesSection";
 import ValuesSection from "../components/values/ValuesSection";
-import { getHeroOnly, getAboutSection, getProcessSection, getContactSection, getServicesSectionFromHome, getServicesListFromApi, getProjectsList, getProjectsSection } from "../lib/api/home";
+import { getHeroOnly, getAboutSection, getProcessSection, getContactSection, getServicesSectionFromHome, getServicesListFromApi, getServiceCategories, getProjectsList, getProjectsSection } from "../lib/api/home";
 
 export default async function Home() {
-  const [heroData, about, process, contact, servicesSection, servicesList, projectsList, projectsSection] = await Promise.all([
+  const [heroData, about, process, contact, servicesSection, servicesList, serviceCategories, projectsList, projectsSection] = await Promise.all([
     getHeroOnly(),
     getAboutSection(),
     getProcessSection(),
     getContactSection(),
     getServicesSectionFromHome(),
     getServicesListFromApi(),
+    getServiceCategories(),
     getProjectsList(),
     getProjectsSection(),
   ]);
@@ -30,7 +31,7 @@ export default async function Home() {
         title={projSec?.title ?? undefined}
         description={projSec?.description ?? undefined}
       />
-      <ServicesSection section={servicesSection?.services_section ?? null} services={servicesList} />
+      <ServicesSection section={servicesSection?.services_section ?? null} services={servicesList} categories={serviceCategories} />
       <div id="value">
         <ValuesSection  />
       </div>

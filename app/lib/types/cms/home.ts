@@ -193,6 +193,44 @@ export interface ProjectItem {
   images?: Array<any>;
 }
 
+/**
+ * Editable content for the two service category cards (General / Design)
+ * shown on the homepage Services section and used as the header on the
+ * /services?category=... pages. Managed from the admin dashboard.
+ */
+export interface ServiceCategoryContent {
+  id?: number;
+  key: "general" | "design";
+  title?: string | null;
+  description?: string | null;
+  icon_path?: string | null;
+  /** Absolute icon URL appended by the backend (asset('storage/'.icon_path)). */
+  url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Default category card content used as a fallback until the backend
+ * `/api/service-categories` endpoint is available, or if a request fails.
+ */
+export const DEFAULT_SERVICE_CATEGORIES: ServiceCategoryContent[] = [
+  {
+    key: "general",
+    title: "General Construction",
+    description:
+      "Commercial build-outs, renovations, and fit-outs across restaurants, cafes, and retail spaces delivered on time.",
+    url: null,
+  },
+  {
+    key: "design",
+    title: "Design Services",
+    description:
+      "Interior design, architectural drafting, 3D visualization, and space planning to bring your vision to life.",
+    url: null,
+  },
+];
+
 export interface ServiceItem {
   id: number;
   image_media_id?: number | null;
@@ -200,6 +238,7 @@ export interface ServiceItem {
   description?: string | null;
   content?: string | null;
   featured?: boolean;
+  type?: 'general' | 'design';
   slug?: string | null;
   icon_path?: string | null;
   url?: string | null;
