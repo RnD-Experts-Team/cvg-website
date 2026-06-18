@@ -153,13 +153,11 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="p-8 max-w-full">
-      <h1 className="text-3xl font-bold mb-6">Edit Contact Section</h1>
-
+    <div className="p-6 max-w-full space-y-6">
       {contactSection ? (
-        <Card className="mb-10">
+        <Card>
           <CardHeader>
-            <CardTitle>Edit Contact Section</CardTitle>
+            <CardTitle>Contact Section</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4">
@@ -199,7 +197,7 @@ export default function ContactPage() {
         </Card>
       ) : (
         loading ? (
-          <Card className="mb-10">
+          <Card>
             <CardHeader>
               <CardTitle>
                 <Skeleton className="h-6 w-48" />
@@ -233,7 +231,7 @@ export default function ContactPage() {
         )
       )}
 
-      <h2 className="text-2xl font-bold mt-10 mb-4">Contact Submissions</h2>
+      <h2 className="text-xl font-semibold text-[#1E1E1E] mt-2">Contact Submissions</h2>
 
       <div className="mt-8">
         {loading ? (

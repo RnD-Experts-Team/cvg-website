@@ -4,19 +4,19 @@
 import { useState, useEffect } from "react";
 import { AboutSection } from "./types";
 import { getAboutSection, updateAboutSection } from "./about.service";
-import { toast } from "react-toastify";  // If you want to show success/error messages
+import { toast } from "react-toastify";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 export default function AboutPage() {
   const [aboutSection, setAboutSection] = useState<AboutSection | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch about section data on page load
   useEffect(() => {
     const fetchAboutSection = async () => {
       setLoading(true);
@@ -34,7 +34,6 @@ export default function AboutPage() {
     fetchAboutSection();
   }, []);
 
-  // Handle the image file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -42,18 +41,15 @@ export default function AboutPage() {
     }
   };
 
-  // Handle saving the updated data
   const handleSave = async () => {
     if (!aboutSection) return;
     setLoading(true);
 
-    // Prepare the payload: keep `image` as an object to satisfy `AboutSection` type.
     const updatedData: any = { ...aboutSection };
 
     try {
       let response: any;
       if (imageFile) {
-        // Send multipart form when a new image file is provided
         const form = new FormData();
         form.append('title', String(updatedData.title ?? ''));
         form.append('description', String(updatedData.description ?? ''));
@@ -62,11 +58,9 @@ export default function AboutPage() {
 
         response = await updateAboutSection(form as unknown as any);
       } else {
-        // No file: send the typed object
         response = await updateAboutSection(updatedData);
       }
 
-      // update state with returned AboutSection (unwrap ApiResponse if present)
       const updatedPayload = response && typeof response === 'object' && 'data' in response ? (response as any).data : response;
       setAboutSection(updatedPayload ?? null);
       toast.success('About section updated successfully!');
@@ -80,96 +74,93 @@ export default function AboutPage() {
     }
   };
 
-  return (
-    <div className="p-8 max-w-full">
-      <h1 className="text-3xl font-bold mb-6"> About Section</h1>
-
-      {aboutSection ? (
-        <div>
-          <div className="mb-4">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={aboutSection.title}
-              onChange={(e) => setAboutSection({ ...aboutSection, title: e.target.value })}
-              className="w-full mt-2"
-            />
-          </div>
-
-          <div className="mb-4">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={aboutSection.description}
-              onChange={(e) => setAboutSection({ ...aboutSection, description: e.target.value })}
-              className="w-full mt-2"
-            />
-          </div>
-
-          <div className="mb-4">
-            <Label htmlFor="image">Image</Label>
-            <Input
-              type="file"
-              id="image"
-              onChange={handleImageChange}
-              className="w-full mt-2"
-            />
-            {aboutSection?.image?.url && (
+  if (loading && !aboutSection) {
+    return (
+      <div className="p-6 max-w-full space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle><Skeleton className="h-6 w-40" /></CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Skeleton className="h-4 w-24 mb-2" />
+              <Skeleton className="h-10 w-full rounded" />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-32 mb-2" />
+              <Skeleton className="h-24 w-full rounded" />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-20 mb-2" />
+              <Skeleton className="h-10 w-full rounded" />
               <div className="mt-4">
-                <img
-                  src={aboutSection.image.url}
-                  alt={aboutSection.image?.alt_text}
-                  width={aboutSection.image?.width}
-                  height={aboutSection.image?.height}
-                  className="max-w-[200px]"
-                />
-              </div>
-            )}
-          </div>
-
-          <Button
-            onClick={handleSave}
-            disabled={loading}
-            className="mt-6"
-          >
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      ) : (
-        (loading && !aboutSection) ? (
-          <div className="p-8 max-w-full space-y-6">
-            <h1 className="text-3xl font-bold mb-6">
-              <Skeleton className="h-8 w-72" />
-            </h1>
-
-            <div className="space-y-4">
-              <div>
-                <Skeleton className="h-4 w-24 mb-2" />
-                <Skeleton className="h-10 w-full rounded" />
-              </div>
-
-              <div>
-                <Skeleton className="h-4 w-32 mb-2" />
-                <Skeleton className="h-24 w-full rounded" />
-              </div>
-
-              <div>
-                <Skeleton className="h-4 w-20 mb-2" />
-                <Skeleton className="h-10 w-full rounded" />
-                <div className="mt-4">
-                  <Skeleton className="h-40 w-56 rounded" />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <Skeleton className="h-10 w-40 rounded" />
+                <Skeleton className="h-40 w-56 rounded" />
               </div>
             </div>
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )
-      )}
+            <Skeleton className="h-10 w-40 rounded" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-full space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>About Section</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          {aboutSection ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={aboutSection.title}
+                  onChange={(e) => setAboutSection({ ...aboutSection, title: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={aboutSection.description}
+                  onChange={(e) => setAboutSection({ ...aboutSection, description: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image">Image</Label>
+                <Input
+                  type="file"
+                  id="image"
+                  onChange={handleImageChange}
+                />
+                {aboutSection?.image?.url && (
+                  <div className="mt-3">
+                    <img
+                      src={aboutSection.image.url}
+                      alt={aboutSection.image?.alt_text}
+                      width={aboutSection.image?.width}
+                      height={aboutSection.image?.height}
+                      className="max-w-[200px] rounded border"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <Button onClick={handleSave} disabled={loading}>
+                {loading ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Loading...</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

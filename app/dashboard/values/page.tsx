@@ -8,7 +8,8 @@ import Image from "next/image";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { toast } from "react-toastify"; // For notifications
-import { Input } from "../components/ui/input"; // If you want to use a custom input component
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 
 const ValuesPage = () => {
   const [valuesSection, setValuesSection] = useState<ValuesSection | null>(
@@ -130,7 +131,7 @@ const ValuesPage = () => {
 
   if (isLoading)
     return (
-      <div className="container mx-auto p-6">
+      <div className="p-6 space-y-6">
         <Skeleton className="h-8 w-64 mb-6" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,20 +157,23 @@ const ValuesPage = () => {
     );
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl mb-4"> Values Section</h1>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold text-[#1E1E1E]">Values Section</h1>
+      </div>
       <div className="mb-6">
-        <label htmlFor="image" className="block text-lg font-bold mb-2  ">
+        <Label htmlFor="sectionTitle" className="block text-sm font-medium mb-2">
           Section Title
-        </label>
+        </Label>
         <Input
+          id="sectionTitle"
           value={valuesSection?.title || ""}
           onChange={(e) => {
             if (!valuesSection) return;
             setValuesSection({ ...valuesSection, title: e.target.value });
           }}
           placeholder="Section title"
-          className="text-3xl  mb-6"
+          className="mb-2"
         />
       </div>
 

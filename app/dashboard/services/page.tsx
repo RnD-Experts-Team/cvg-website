@@ -257,8 +257,8 @@ export default function ServicesPage() {
                       <td className="px-4 py-2">
                         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                           service.type === 'design'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
+                            ? 'bg-[#1E1E1E]/10 text-[#1E1E1E]'
+                            : 'bg-[#F68620]/15 text-[#c96f10]'
                         }`}>
                           {service.type === 'design' ? 'Design' : 'General'}
                         </span>

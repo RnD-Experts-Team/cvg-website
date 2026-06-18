@@ -1,13 +1,9 @@
 export default function Page() {
-  // Dashboard index content — keep it minimal. Nested routes (e.g. /dashboard/blank)
-  // will now render inside the dashboard layout (`layout.tsx`).
   return (
-    <div style={{ padding: 12 }}>
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="text-muted-foreground mt-2">Welcome to your CVG-CMS.</p>
-      <div className="mt-6">
-        {/* Keep BlankPage available for quick preview on the index if desired */}
-        {/* <BlankPage /> */}
+    <div className="p-6 space-y-4">
+      <div>
+        <h1 className="text-2xl font-semibold text-[#1E1E1E]">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Welcome to your CVG-CMS.</p>
       </div>
     </div>
   );

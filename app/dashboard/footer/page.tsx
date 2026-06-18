@@ -172,7 +172,7 @@ export default function FooterPage() {
     );
 
   return (
-    <div className="p-6 max-w-full space-y-6 " style={{ padding: 12 }}>
+    <div className="p-6 max-w-full space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Footer CMS</CardTitle>
