@@ -22,8 +22,32 @@ type Draft = {
   icon: File | null;
 };
 
+/**
+ * Pull the ServiceCategory array out of the API response. The backend wraps
+ * the list in `data` ({ success, data: [...], message }); a few extra
+ * fallbacks keep this resilient to minor shape changes.
+ */
+function extractCategoryList(raw: any): ServiceCategory[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+
+  const candidates: any[] = [
+    raw.data,
+    raw.data?.data,
+    raw.data?.service_categories,
+    raw.service_categories,
+  ];
+
+  for (const c of candidates) {
+    if (Array.isArray(c)) return c;
+  }
+
+  return [];
+}
+
 export default function ServiceCategoriesManager() {
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const [savingId, setSavingId] = useState<number | null>(null);
@@ -35,9 +59,10 @@ export default function ServiceCategoriesManager() {
   async function fetchCategories() {
     try {
       setLoading(true);
+      setFetchError(null);
       const service = new ServiceService();
-      const res = await service.getServiceCategories();
-      const list = Array.isArray(res.data) ? res.data : [];
+      const raw = await service.getServiceCategories();
+      const list = extractCategoryList(raw);
       setCategories(list);
       setDrafts(
         Object.fromEntries(
@@ -48,7 +73,9 @@ export default function ServiceCategoriesManager() {
         ),
       );
     } catch (err: any) {
-      toast.error(err?.message || "Failed to load service categories");
+      const msg = err?.message || "Failed to load service categories";
+      setFetchError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -70,14 +97,19 @@ export default function ServiceCategoriesManager() {
         description: draft.description,
         icon: draft.icon,
       });
-      // Refresh the saved row with the server response (new icon url etc.)
-      if (res?.data) {
+
+      const saved: ServiceCategory | null =
+        res && typeof res === "object"
+          ? (res as any).data ?? (res as any)
+          : null;
+
+      if (saved && saved.id) {
         setCategories((prev) =>
-          prev.map((c) => (c.id === category.id ? res.data : c)),
+          prev.map((c) => (c.id === category.id ? saved : c)),
         );
         updateDraft(category.id, { icon: null });
       }
-      toast.success(`${CATEGORY_LABELS[category.key]} card updated`);
+      toast.success(`${CATEGORY_LABELS[category.key] ?? category.key} card updated`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to update category");
     } finally {
@@ -85,6 +117,7 @@ export default function ServiceCategoriesManager() {
     }
   }
 
+  /* ── Render ─────────────────────────────────────────────────────────── */
   return (
     <Card>
       <CardHeader>
@@ -96,7 +129,8 @@ export default function ServiceCategoriesManager() {
       </CardHeader>
 
       <CardContent>
-        {loading ? (
+        {/* Loading */}
+        {loading && (
           <div className="grid gap-6 md:grid-cols-2">
             {Array.from({ length: 2 }).map((_, i) => (
               <div key={i} className="space-y-4 rounded-lg border p-4">
@@ -107,11 +141,37 @@ export default function ServiceCategoriesManager() {
               </div>
             ))}
           </div>
-        ) : categories.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No service categories found.
-          </p>
-        ) : (
+        )}
+
+        {/* Error state */}
+        {!loading && fetchError && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive space-y-2">
+            <p className="font-medium">Failed to load categories</p>
+            <p className="text-muted-foreground">{fetchError}</p>
+            <Button variant="outline" size="sm" onClick={fetchCategories}>
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !fetchError && categories.length === 0 && (
+          <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground space-y-3 text-center">
+            <p className="font-medium text-foreground">No service category cards yet</p>
+            <p>
+              They&apos;ll appear here automatically once the server has them.
+              Try refreshing in a moment.
+            </p>
+            <div className="flex justify-center pt-1">
+              <Button variant="outline" size="sm" onClick={fetchCategories}>
+                Refresh
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Editors */}
+        {!loading && !fetchError && categories.length > 0 && (
           <div className="grid gap-6 md:grid-cols-2">
             {categories.map((category) => {
               const draft = drafts[category.id] ?? {
@@ -121,21 +181,30 @@ export default function ServiceCategoriesManager() {
               };
               const previewUrl = draft.icon
                 ? URL.createObjectURL(draft.icon)
-                : category.url || null;
+                : category.url
+                ? category.url.replace("http://", "https://")
+                : null;
 
               return (
-                <div
-                  key={category.id}
-                  className="space-y-4 rounded-lg border p-4"
-                >
+                <div key={category.id} className="space-y-4 rounded-lg border p-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">
                       {CATEGORY_LABELS[category.key] ?? category.key}
                     </h3>
-                    <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium capitalize">
+                    <span className="inline-block rounded-full bg-[#F68620]/15 text-[#c96f10] px-2 py-0.5 text-xs font-medium capitalize">
                       {category.key}
                     </span>
                   </div>
+
+                  {previewUrl && (
+                    <div className="flex items-center gap-3 rounded-lg bg-[#F68620] p-3 w-fit">
+                      <img
+                        src={previewUrl}
+                        alt={`${category.key} icon preview`}
+                        className="h-12 w-12 object-contain"
+                      />
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label>Card Title</Label>
@@ -151,12 +220,10 @@ export default function ServiceCategoriesManager() {
                   <div className="space-y-2">
                     <Label>Card Description</Label>
                     <Textarea
-                      rows={4}
+                      rows={3}
                       value={draft.description}
                       onChange={(e) =>
-                        updateDraft(category.id, {
-                          description: e.target.value,
-                        })
+                        updateDraft(category.id, { description: e.target.value })
                       }
                       placeholder="Enter category card description"
                     />
@@ -173,16 +240,10 @@ export default function ServiceCategoriesManager() {
                         })
                       }
                     />
-                    {previewUrl ? (
-                      <img
-                        src={previewUrl}
-                        alt={`${category.key} icon`}
-                        className="h-16 w-16 rounded border object-contain p-1"
-                      />
-                    ) : (
-                      <div className="text-sm text-muted-foreground">
-                        No icon selected
-                      </div>
+                    {!previewUrl && (
+                      <p className="text-xs text-muted-foreground">
+                        No icon uploaded — the built-in icon will be used on the website.
+                      </p>
                     )}
                   </div>
 

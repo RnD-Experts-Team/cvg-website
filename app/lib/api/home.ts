@@ -232,23 +232,36 @@ export async function getServiceCategories(): Promise<ServiceCategoryContent[]> 
     : `${base}/api/service-categories`;
 
   try {
-    const res = await fetch(endpoint, { next: { revalidate: 600 } });
+    const res = await fetch(endpoint, { next: { revalidate: 300 } });
     if (!res.ok) return DEFAULT_SERVICE_CATEGORIES;
     const json = await parseJsonHttps<any>(res);
-    const list: ServiceCategoryContent[] = json.data ?? json ?? [];
-    if (!Array.isArray(list) || list.length === 0) return DEFAULT_SERVICE_CATEGORIES;
+
+    // Handle multiple response shapes the backend might return
+    let list: any[] = [];
+    if (Array.isArray(json)) {
+      list = json;
+    } else if (Array.isArray(json.data)) {
+      list = json.data;
+    } else if (json.data && Array.isArray(json.data.data)) {
+      list = json.data.data;
+    } else if (json.data && Array.isArray(json.data.service_categories)) {
+      list = json.data.service_categories;
+    }
+
+    if (list.length === 0) return DEFAULT_SERVICE_CATEGORIES;
 
     // Merge API values over defaults so a missing field never blanks a card.
     return DEFAULT_SERVICE_CATEGORIES.map((def) => {
-      const match = list.find((c) => c?.key === def.key);
-      return match
-        ? {
-            ...def,
-            ...match,
-            title: match.title || def.title,
-            description: match.description || def.description,
-          }
-        : def;
+      const match = list.find((c: any) => c?.key === def.key);
+      if (!match) return def;
+      return {
+        ...def,
+        ...match,
+        // Never let a null/empty API value wipe out the default text
+        title: match.title || def.title,
+        description: match.description || def.description,
+        url: match.url ?? match.icon_url ?? null,
+      };
     });
   } catch {
     return DEFAULT_SERVICE_CATEGORIES;
