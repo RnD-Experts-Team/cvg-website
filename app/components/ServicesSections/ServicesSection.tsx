@@ -256,10 +256,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           {/* Sub-cards grid */}
           <div
             ref={subGridRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            className="flex flex-wrap justify-center gap-4"
           >
             {activeServices.map((svc) => (
-              <div key={svc.id} className="service-card-wrap">
+              <div
+                key={svc.id}
+                className="service-card-wrap w-full sm:w-[calc(50%-0.55rem)] lg:w-[calc(25%-0.8rem)]"
+              >
                 <ServiceCard service={svc} />
               </div>
             ))}

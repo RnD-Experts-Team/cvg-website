@@ -106,10 +106,15 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         {/* Grid */}
         <div
           ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+          className="flex flex-wrap justify-center gap-6 md:gap-8"
         >
           {featuredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <div
+              key={project.id}
+              className="w-full sm:w-[calc(50%-1.1rem)] lg:w-[calc(25%-1.6rem)]"
+            >
+              <ProjectCard project={project} />
+            </div>
           ))}
         </div>
       </div>
