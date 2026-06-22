@@ -45,7 +45,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       ? initialCategories
       : DEFAULT_SERVICE_CATEGORIES;
   const [generalServices, setGeneralServices] = useState<ServiceItem[]>(
-    initialServices ?? []
+    (initialServices ?? []).filter((s) => !s.type || s.type === "general")
   );
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [designServices, setDesignServices] = useState<ServiceItem[]>([]);
@@ -59,7 +59,9 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   /* Keep in sync if parent updates props */
   useEffect(() => { setSection(initialSection ?? null); }, [initialSection]);
-  useEffect(() => { setGeneralServices(initialServices ?? []); }, [initialServices]);
+  useEffect(() => {
+    setGeneralServices((initialServices ?? []).filter((s) => !s.type || s.type === "general"));
+  }, [initialServices]);
 
   /* ── Scroll-triggered entrance for category cards ─────────────────── */
   useEffect(() => {
@@ -189,9 +191,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   /* ── Derived data ─────────────────────────────────────────────────── */
   const activeServices: ServiceItem[] =
-    activeCategory === "design"
-      ? designServices
-      : generalServices.slice(0, 4);
+    (activeCategory === "design" ? designServices : generalServices).slice(0, 4);
 
   const activeCategoryData = CATEGORIES.find((c) => c.key === activeCategory);
 

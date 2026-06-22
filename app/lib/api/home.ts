@@ -152,9 +152,9 @@ export async function getServicesSectionFromHome(): Promise<
 
 export async function getServicesListFromApi(): Promise<ServiceItem[]> {
   const base = API_BASE.replace(/\/$/, '');
-  const endpoint = base.endsWith('/api') ? `${base}/services` : `${base}/api/services`;
+  const endpoint = base.endsWith('/api') ? `${base}/services?per_page=100` : `${base}/api/services?per_page=100`;
 
-  const res = await fetch(endpoint, { next: { revalidate: 600 } });
+  const res = await fetch(endpoint, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to fetch services: ${res.status}`);
   const json = await parseJsonHttps<any>(res);
 

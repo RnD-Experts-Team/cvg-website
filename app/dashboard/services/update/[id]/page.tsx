@@ -66,7 +66,7 @@ const UpdateServicePage = () => {
       const serviceService = new ServiceService();
       const payload: UpdateServiceRequest = {
         id: service.id,
-        title: slug === service.slug ? null : title,
+        title,
         description,
         content,
         type,
