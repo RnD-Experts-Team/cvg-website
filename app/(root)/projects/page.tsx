@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getProjectsList, getCategories, getProjectsSection, getContactSection } from "@/app/lib/api/home";
 import ProjectsClient from "./ProjectsClient";
 

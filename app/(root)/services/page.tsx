@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import ServicesClient from "./ServicesClient";
 import { getServicesSectionFromHome, getServicesPage, getServiceCategories } from "../../lib/api/home";
 
