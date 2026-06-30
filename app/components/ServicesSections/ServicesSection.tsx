@@ -191,7 +191,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   /* ── Derived data ─────────────────────────────────────────────────── */
   const activeServices: ServiceItem[] =
-    (activeCategory === "design" ? designServices : generalServices).slice(0, 4);
+    activeCategory === "design" ? designServices : generalServices;
 
   const activeCategoryData = CATEGORIES.find((c) => c.key === activeCategory);
 

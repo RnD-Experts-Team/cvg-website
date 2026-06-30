@@ -6,7 +6,7 @@ export async function getFooterData(): Promise<FooterData> {
     brand: {
       logoUrl: "/img/blacklogo.png",
       title: "Commercial Vision Group",
-      copyright: "© 2025 CVG Construction All rights reserved."
+      copyright: "© 2026 CVG Construction All rights reserved."
     },
     socialMedia: [
       {

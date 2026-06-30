@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProjectCard from "./ProjectCard";
@@ -16,13 +16,8 @@ interface ProjectsSectionProps {
   description?: string;
 }
 
-const CARD_WIDTH = 300;
-const CARD_GAP   = 24;
-const CARD_STEP  = CARD_WIDTH + CARD_GAP;
-const COPIES     = 4;
-const AUTO_SPEED = 100; // px / sec
+const GAP = 24;
 
-/* ── Inline SVG chevrons ─────────────────────────────────────────────── */
 const ChevronLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
@@ -38,7 +33,13 @@ const ChevronRight = () => (
   </svg>
 );
 
-/* ── Component ───────────────────────────────────────────────────────── */
+/* Cards visible at a time based on viewport width */
+function getVisible(vw: number, total: number): number {
+  if (vw >= 1280) return Math.min(total, 5);
+  if (vw >= 1024) return Math.min(total, 3);
+  if (vw >= 640)  return Math.min(total, 2);
+  return 1;
+}
 
 const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   projects = [],
@@ -49,135 +50,61 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   const headerRef  = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const trackRef   = useRef<HTMLDivElement>(null);
-  const goTweenRef = useRef<gsap.core.Tween | null>(null);
+  const tweenRef   = useRef<gsap.core.Tween | null>(null);
+  const touchX     = useRef(0);
 
-  /**
-   * All mutable animation state in a ref — never stale inside callbacks.
-   * arrowBusy: true while an arrow tween is running (ticker yields to it)
-   */
-  const stateRef = useRef({
-    pos: 0,
-    paused: false,
-    arrowBusy: false,
-  });
+  const [index,   setIndex]   = useState(0);
+  const [visible, setVisible] = useState(3);
 
-  /**
-   * Touch tracking state. Kept separate so it doesn't mix with animation
-   * state mutations that happen on every ticker frame.
-   */
-  const touchRef = useRef({
-    startX: 0,
-    startY: 0,
-    lastX: 0,
-    dir: "unknown" as "unknown" | "h" | "v",
-  });
+  const count   = projects.length;
+  const maxIdx  = Math.max(0, count - visible);
+  const showAll = visible >= count; // all cards fit → no slider needed
 
-  const oneSetWidth = CARD_STEP * (projects.length || 1);
-
-  /* 4 identical copies → loop never gaps */
-  const loopCards = projects.length > 0
-    ? Array.from({ length: COPIES }, () => projects).flat()
-    : [];
-
-  /* Wrap position to [0, oneSetWidth) */
-  const normalize = useCallback(
-    (pos: number) => ((pos % oneSetWidth) + oneSetWidth) % oneSetWidth,
-    [oneSetWidth],
-  );
-
-  /* Smooth per-card arrow jump */
-  const go = useCallback(
-    (dir: 1 | -1) => {
-      const s = stateRef.current;
-      s.arrowBusy = true;
-      const start = s.pos;
-      const proxy = { p: 0 };
-
-      goTweenRef.current?.kill();
-      goTweenRef.current = gsap.to(proxy, {
-        p: 1,
-        duration: 0.45,
-        ease: "power2.inOut",
-        onUpdate: () => {
-          s.pos = normalize(start + dir * CARD_STEP * proxy.p);
-          if (trackRef.current) gsap.set(trackRef.current, { x: -s.pos });
-        },
-        onComplete: () => { s.arrowBusy = false; },
-      });
-    },
-    [normalize],
-  );
-
+  /* ── Responsive visible count ─────────────────────────────────────── */
   useEffect(() => {
-    if (!projects.length) return;
+    const update = () => {
+      const v = getVisible(window.innerWidth, count);
+      setVisible(v);
+      setIndex(i => Math.min(i, Math.max(0, count - v)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [count]);
 
-    const s     = stateRef.current;
-    const touch = touchRef.current;
+  /* ── Animate track on index / visible change ──────────────────────── */
+  useEffect(() => {
     const wrapper = wrapperRef.current;
+    const track   = trackRef.current;
+    if (!track) return;
 
-    /* ── Ticker-based auto-play ──────────────────────────────────── */
-    // GSAP passes deltaTime in ms → ÷1000 converts to px/sec scale
-    const tick = (_time: number, dt: number) => {
-      if (s.paused || s.arrowBusy) return;
-      s.pos = normalize(s.pos + AUTO_SPEED * (dt / 1000));
-      if (trackRef.current) gsap.set(trackRef.current, { x: -s.pos });
+    if (showAll || !wrapper) {
+      gsap.set(track, { x: 0 });
+      return;
+    }
+
+    const cw = (wrapper.offsetWidth - GAP * (visible - 1)) / visible;
+    const x  = -(index * (cw + GAP));
+    tweenRef.current?.kill();
+    tweenRef.current = gsap.to(track, { x, duration: 0.5, ease: "power2.inOut" });
+  }, [index, visible, showAll]);
+
+  /* ── Re-snap position on resize without animation ─────────────────── */
+  useEffect(() => {
+    const onResize = () => {
+      const wrapper = wrapperRef.current;
+      const track   = trackRef.current;
+      if (!wrapper || !track || showAll) return;
+      const cw = (wrapper.offsetWidth - GAP * (visible - 1)) / visible;
+      gsap.set(track, { x: -(index * (cw + GAP)) });
     };
-    gsap.ticker.add(tick);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [index, visible, showAll]);
 
-    /* ── Mouse-wheel ─────────────────────────────────────────────── */
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      s.pos = normalize(s.pos + e.deltaY * 0.7);
-      if (trackRef.current) gsap.set(trackRef.current, { x: -s.pos });
-    };
-    wrapper?.addEventListener("wheel", onWheel, { passive: false });
-
-    /* ── Touch: swipe to drag ────────────────────────────────────── */
-    const onTouchStart = (e: TouchEvent) => {
-      touch.startX = touch.lastX = e.touches[0].clientX;
-      touch.startY = e.touches[0].clientY;
-      touch.dir = "unknown";
-      s.paused = true;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      const x = e.touches[0].clientX;
-      const y = e.touches[0].clientY;
-
-      /* Determine swipe axis on first ≥3 px of movement */
-      if (touch.dir === "unknown") {
-        const dx = Math.abs(x - touch.startX);
-        const dy = Math.abs(y - touch.startY);
-        if (dx > 3 || dy > 3) touch.dir = dx >= dy ? "h" : "v";
-      }
-
-      if (touch.dir === "h") {
-        e.preventDefault();                    // block page scroll
-        const delta = touch.lastX - x;        // positive = drag left (forward)
-        s.pos = normalize(s.pos + delta);
-        if (trackRef.current) gsap.set(trackRef.current, { x: -s.pos });
-      }
-
-      touch.lastX = x;
-    };
-
-    const onTouchEnd = () => {
-      touch.dir = "unknown";
-      s.paused = false;                        // resume auto-play
-    };
-
-    wrapper?.addEventListener("touchstart",  onTouchStart, { passive: true });
-    wrapper?.addEventListener("touchmove",   onTouchMove,  { passive: false });
-    wrapper?.addEventListener("touchend",    onTouchEnd,   { passive: true });
-    wrapper?.addEventListener("touchcancel", onTouchEnd,   { passive: true });
-
-    /* ── Hover pause (desktop) ───────────────────────────────────── */
-    const onEnter = () => { s.paused = true; };
-    const onLeave = () => { s.paused = false; };
-    wrapper?.addEventListener("mouseenter", onEnter);
-    wrapper?.addEventListener("mouseleave", onLeave);
-
-    /* ── Scroll-triggered entrance animations ────────────────────── */
+  /* ── Scroll-triggered entrance animations ─────────────────────────── */
+  useEffect(() => {
+    if (!count) return;
     const ctx = gsap.context(() => {
       if (headerRef.current) {
         gsap.set(headerRef.current, { autoAlpha: 0, y: 40 });
@@ -202,24 +129,22 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         });
       }
     }, sectionRef);
+    return () => ctx.revert();
+  }, [count]);
 
-    return () => {
-      gsap.ticker.remove(tick);
-      goTweenRef.current?.kill();
-      ctx.revert();
-      wrapper?.removeEventListener("wheel",       onWheel);
-      wrapper?.removeEventListener("touchstart",  onTouchStart);
-      wrapper?.removeEventListener("touchmove",   onTouchMove);
-      wrapper?.removeEventListener("touchend",    onTouchEnd);
-      wrapper?.removeEventListener("touchcancel", onTouchEnd);
-      wrapper?.removeEventListener("mouseenter",  onEnter);
-      wrapper?.removeEventListener("mouseleave",  onLeave);
-    };
-  }, [projects, normalize]);
+  if (!count) return null;
 
-  if (!loopCards.length) return null;
+  const prev = () => setIndex(i => Math.max(0, i - 1));
+  const next = () => setIndex(i => Math.min(maxIdx, i + 1));
 
-  /* ── Arrow button shared classes ─────────────────────────────────── */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const dx = touchX.current - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) dx > 0 ? next() : prev();
+  };
+
   const arrowCls = [
     "absolute top-1/2 -translate-y-1/2 z-20",
     "flex items-center justify-center w-11 h-11 rounded-full",
@@ -228,20 +153,30 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     "shadow-md",
     "hover:bg-[#F68620] hover:border-[#F68620] hover:shadow-xl hover:scale-105",
     "dark:hover:bg-[#F68620] dark:hover:border-[#F68620]",
-    "group transition-all duration-200 backdrop-blur-sm",
-    "select-none",
+    "group transition-all duration-200 backdrop-blur-sm select-none",
+    "disabled:opacity-30 disabled:cursor-not-allowed",
+    "disabled:hover:bg-white disabled:hover:border-[#E0E0E0]",
+    "disabled:hover:shadow-md disabled:hover:scale-100",
+    "dark:disabled:hover:bg-white/10 dark:disabled:hover:border-white/15",
   ].join(" ");
 
   const iconCls =
     "text-[#1E1E1E] dark:text-white group-hover:text-white transition-colors duration-200";
 
+  const cardStyle: React.CSSProperties = showAll
+    ? { flex: "1 1 0", minWidth: 0, maxWidth: "300px" }
+    : {
+        flex: `0 0 calc((100% - ${GAP * (visible - 1)}px) / ${visible})`,
+        minWidth: 0,
+      };
+
   return (
     <section
       ref={sectionRef}
       id="projects"
-      className="bg-[#EEEEEE] dark:bg-[#111111] py-20 overflow-hidden"
+      className="bg-[#EEEEEE] dark:bg-[#111111] py-20"
     >
-      {/* ── Header ────────────────────────────────────────────────── */}
+      {/* Header */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-20">
         <div ref={headerRef} className="text-center mb-14">
           <span className="inline-block text-[#F68620] text-xs font-semibold tracking-[0.2em] uppercase mb-3">
@@ -257,47 +192,73 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         </div>
       </div>
 
-      {/* ── Slider ────────────────────────────────────────────────── */}
-      <div className="relative">
-
-        <button onClick={() => go(-1)} aria-label="Previous projects"
-          className={`${arrowCls} left-4 md:left-8`}>
-          <span className={iconCls}><ChevronLeft /></span>
-        </button>
+      {/* Slider */}
+      <div className="relative max-w-[1440px] mx-auto px-14 md:px-24">
+        {!showAll && (
+          <button
+            onClick={prev}
+            disabled={index === 0}
+            aria-label="Previous projects"
+            className={`${arrowCls} left-2 md:left-4`}
+          >
+            <span className={iconCls}><ChevronLeft /></span>
+          </button>
+        )}
 
         <div
           ref={wrapperRef}
-          className="overflow-hidden py-6 touch-pan-y"
-          style={{
+          className="overflow-hidden py-6"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          style={!showAll ? {
             maskImage:
-              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+              "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
             WebkitMaskImage:
-              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
-          }}
+              "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
+          } : undefined}
         >
           <div
             ref={trackRef}
-            className="flex will-change-transform"
-            style={{ gap: `${CARD_GAP}px` }}
+            className={`flex will-change-transform ${showAll ? "justify-center" : ""}`}
+            style={{ gap: `${GAP}px` }}
           >
-            {loopCards.map((project, i) => (
-              <div
-                key={`${project.id}-${i}`}
-                style={{ width: `${CARD_WIDTH}px` }}
-                className="flex-shrink-0"
-              >
+            {projects.map(project => (
+              <div key={project.id} style={cardStyle}>
                 <ProjectCard project={project} />
               </div>
             ))}
           </div>
         </div>
 
-        <button onClick={() => go(1)} aria-label="Next projects"
-          className={`${arrowCls} right-4 md:right-8`}>
-          <span className={iconCls}><ChevronRight /></span>
-        </button>
-
+        {!showAll && (
+          <button
+            onClick={next}
+            disabled={index >= maxIdx}
+            aria-label="Next projects"
+            className={`${arrowCls} right-2 md:right-4`}
+          >
+            <span className={iconCls}><ChevronRight /></span>
+          </button>
+        )}
       </div>
+
+      {/* Pagination dots */}
+      {!showAll && maxIdx > 0 && (
+        <div className="flex justify-center gap-2 mt-6">
+          {Array.from({ length: maxIdx + 1 }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-2 rounded-full transition-all duration-200 ${
+                i === index
+                  ? "w-6 bg-[#F68620]"
+                  : "w-2 bg-gray-400/50 hover:bg-gray-400"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

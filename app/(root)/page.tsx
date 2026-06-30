@@ -5,20 +5,25 @@ import ProcessSection from "../components/process/ProcessSection";
 import ProjectsSection from "../components/ProjectSections/ProjectsSection";
 import ServicesSection from "../components/ServicesSections/ServicesSection";
 import ValuesSection from "../components/values/ValuesSection";
-import { getHeroOnly, getAboutSection, getProcessSection, getContactSection, getServicesSectionFromHome, getServicesListFromApi, getServiceCategories, getProjectsList, getProjectsSection } from "../lib/api/home";
+import { getHeroOnly, getAboutSection, getProcessSection, getContactSection, getServicesSectionFromHome, getServicesPage, getServiceCategories, getProjectsList, getProjectsSection } from "../lib/api/home";
 
 export default async function Home() {
-  const [heroData, about, process, contact, servicesSection, servicesList, serviceCategories, projectsList, projectsSection] = await Promise.all([
+  const [heroData, about, process, contact, servicesSection, servicesPageData, serviceCategories, projectsList, projectsSection] = await Promise.all([
     getHeroOnly(),
     getAboutSection(),
     getProcessSection(),
     getContactSection(),
     getServicesSectionFromHome(),
-    getServicesListFromApi(),
+    getServicesPage(1, "general"),
     getServiceCategories(),
     getProjectsList(),
     getProjectsSection(),
   ]);
+
+  const rawServices: any[] = servicesPageData?.data ?? servicesPageData ?? [];
+  const servicesList = (Array.isArray(rawServices) ? rawServices : []).filter(
+    (s: any) => !s?.type || s?.type === "general"
+  );
 
   const projSec = projectsSection?.projects_section?.projects_section;
 

@@ -57,7 +57,7 @@ export default function Footer({ data }: Props) {
             </p>
           </div>
           <p className="font-semibold text-[21px] text-center text-[#1E1E1E]">
-            © 2025 CVG Construction All rights reserved.
+            © 2026 CVG Construction All rights reserved.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center gap-[38px] lg:w-[651px]">
