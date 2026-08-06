@@ -22,6 +22,7 @@ const CreateServicePage = () => {
   const [featured, setFeatured] = useState(true);
   const [saving, setSaving] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imagePreviewIsVideo, setImagePreviewIsVideo] = useState(false);
   const [iconPreviewUrl, setIconPreviewUrl] = useState<string | null>(null);
 
   const router = useRouter();
@@ -52,14 +53,16 @@ const CreateServicePage = () => {
     }
   };
 
-  // Handle image file change and preview
+  // Handle image/video file change and preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setImage(file);
     if (file) {
       setImagePreviewUrl(URL.createObjectURL(file));
+      setImagePreviewIsVideo(file.type.startsWith('video/'));
     } else {
       setImagePreviewUrl(null);
+      setImagePreviewIsVideo(false);
     }
   };
 
@@ -130,23 +133,33 @@ const CreateServicePage = () => {
               />
             </div>
 
-            {/* Service Image Input */}
+            {/* Service Image/Video Input */}
             <div className="space-y-2">
-              <Label>Service Image</Label>
+              <Label>Service Image or Video</Label>
               <Input
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleImageChange}
               />
 
               {imagePreviewUrl ? (
-                <img
-                  src={imagePreviewUrl}
-                  alt="Preview"
-                  className="h-24 w-24 rounded border object-cover"
-                />
+                imagePreviewIsVideo ? (
+                  <video
+                    src={imagePreviewUrl}
+                    className="h-24 w-24 rounded border object-cover"
+                    muted
+                    playsInline
+                    controls
+                  />
+                ) : (
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Preview"
+                    className="h-24 w-24 rounded border object-cover"
+                  />
+                )
               ) : (
-                <div className="text-sm text-muted-foreground">No image selected</div>
+                <div className="text-sm text-muted-foreground">No image or video selected</div>
               )}
             </div>
 

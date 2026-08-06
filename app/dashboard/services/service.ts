@@ -40,6 +40,8 @@ export type Service = {
   url: string | null;
   image: {
     url: string; // Image URL
+    type?: string; // 'image' | 'video'
+    mime_type?: string;
     alt_text: string;
     title: string;
   };

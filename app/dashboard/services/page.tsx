@@ -181,6 +181,12 @@ export default function ServicesPage() {
                     alt="Preview"
                     className="h-24 w-24 rounded border object-cover"
                   />
+                ) : serviceSection.image?.url ? (
+                  <img
+                    src={serviceSection.image.url}
+                    alt={serviceSection.image.title || "Service image"}
+                    className="h-24 w-24 rounded border object-cover"
+                  />
                 ) : (
                   <div className="text-sm text-muted-foreground">No image selected</div>
                 )}
@@ -266,11 +272,20 @@ export default function ServicesPage() {
                       <td className="px-4 py-2">{service.description}</td>
                       <td className="px-4 py-2">
                         {service.image ? (
-                          <img
-                            src={service.image.url || "/placeholder.png"}
-                            alt={service.title || "Service image"}
-                            className="w-16 h-16 object-cover rounded"
-                          />
+                          service.image.type === 'video' || service.image.mime_type?.startsWith('video/') ? (
+                            <video
+                              src={service.image.url}
+                              muted
+                              playsInline
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          ) : (
+                            <img
+                              src={service.image.url || "/placeholder.png"}
+                              alt={service.title || "Service image"}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )
                         ) : (
                           "No Image"
                         )}

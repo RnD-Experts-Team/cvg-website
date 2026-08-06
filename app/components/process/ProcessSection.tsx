@@ -30,7 +30,7 @@ const ProcessSection: React.FC<Props> = ({ process = null }) => {
     <section
       id="process"
       className="relative bg-cover bg-center py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden"
-      style={{ backgroundImage: "url('/img/bgprocess.jpg')" }}
+      style={{ backgroundImage: `url('${process?.image?.url ?? "/img/bgprocess.jpg"}')` }}
     >
       <div className="mx-auto w-full max-w-7xl">
         <div className="bg-white/10 backdrop-blur-md rounded-[25px] p-6 sm:p-8 md:p-12 border border-white/10 w-full overflow-hidden">

@@ -22,6 +22,7 @@ const UpdateServicePage = () => {
   const [type, setType] = useState<'general' | 'design'>('general');
   const [image, setImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imagePreviewIsVideo, setImagePreviewIsVideo] = useState(false);
   const [icon, setIcon] = useState<File | null>(null);
   const [iconPreviewUrl, setIconPreviewUrl] = useState<string | null>(null);
   const [featured, setFeatured] = useState(true);
@@ -48,9 +49,12 @@ const UpdateServicePage = () => {
           setType(data.type ?? 'general');
           setFeatured(data.featured ?? true);
 
-          // Set image preview for the current image (if available)
+          // Set image/video preview for the current image (if available)
           if (data.image) {
             setImagePreviewUrl(data.image.url);
+            setImagePreviewIsVideo(
+              data.image.type === 'video' || Boolean(data.image.mime_type?.startsWith('video/'))
+            );
           }
           // Set icon preview for the current icon (if available)
           if (data.url) {
@@ -89,14 +93,16 @@ const UpdateServicePage = () => {
     }
   };
 
-  // Handle image file change and preview
+  // Handle image/video file change and preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setImage(file);
     if (file) {
       setImagePreviewUrl(URL.createObjectURL(file));
+      setImagePreviewIsVideo(file.type.startsWith('video/'));
     } else {
       setImagePreviewUrl(null);
+      setImagePreviewIsVideo(false);
     }
   };
 
@@ -211,23 +217,33 @@ const UpdateServicePage = () => {
               />
             </div>
 
-            {/* Service Image Input */}
+            {/* Service Image/Video Input */}
             <div className="space-y-2">
-              <Label>Service Image</Label>
+              <Label>Service Image or Video</Label>
               <Input
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleImageChange}
               />
 
               {imagePreviewUrl ? (
-                <img
-                  src={imagePreviewUrl}
-                  alt="Preview"
-                  className="h-24 w-24 rounded border object-cover"
-                />
+                imagePreviewIsVideo ? (
+                  <video
+                    src={imagePreviewUrl}
+                    className="h-24 w-24 rounded border object-cover"
+                    muted
+                    playsInline
+                    controls
+                  />
+                ) : (
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Preview"
+                    className="h-24 w-24 rounded border object-cover"
+                  />
+                )
               ) : (
-                <div className="text-sm text-muted-foreground">No image selected</div>
+                <div className="text-sm text-muted-foreground">No image or video selected</div>
               )}
             </div>
 

@@ -204,11 +204,23 @@ export default function ServicesClient({
 
                 <div className="service-image w-full">
                   <div className="w-full h-[240px] sm:h-[300px] md:h-[340px] lg:h-[380px] rounded-lg overflow-hidden px-5 lg:px-0">
-                    <img
-                      src={service.image?.url?.replace('http://', 'https://')}
-                      alt={service.image?.title}
-                      className="w-full h-full object-cover object-center rounded-lg"
-                    />
+                    {service.image?.type === 'video' || service.image?.mime_type?.startsWith('video/') ? (
+                      <video
+                        src={service.image?.url?.replace('http://', 'https://')}
+                        className="w-full h-full object-cover object-center rounded-lg"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img
+                        src={service.image?.url?.replace('http://', 'https://')}
+                        alt={service.image?.title}
+                        className="w-full h-full object-cover object-center rounded-lg"
+                      />
+                    )}
                   </div>
                 </div>
               </article>
