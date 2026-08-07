@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 // use plain <img> for CMS remote images to avoid next/image optimization/config issues
 import ContactForm from "@/app/components/contact/ContactForm";
+import ServiceVideoPlayer from "@/app/components/ServicesSections/ServiceVideoPlayer";
 import { ServiceItem, MediaItem } from "@/app/lib/types/cms/home";
 import { GrNext, GrPrevious } from "react-icons/gr";
 
@@ -205,14 +206,9 @@ export default function ServicesClient({
                 <div className="service-image w-full">
                   <div className="w-full h-[240px] sm:h-[300px] md:h-[340px] lg:h-[380px] rounded-lg overflow-hidden px-5 lg:px-0">
                     {service.image?.type === 'video' || service.image?.mime_type?.startsWith('video/') ? (
-                      <video
+                      <ServiceVideoPlayer
                         src={service.image?.url?.replace('http://', 'https://')}
-                        className="w-full h-full object-cover object-center rounded-lg"
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        preload="metadata"
+                        className="w-full h-full"
                       />
                     ) : (
                       <img
