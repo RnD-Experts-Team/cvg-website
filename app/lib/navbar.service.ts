@@ -34,7 +34,7 @@ const mockNavbarData: NavbarData = {
   logoUrl: "/img/logo.png",
   items: [
     { id: 1, label: "Home", link: "/" },
-    { id: 2, label: "Our Projects", link: "/projects" },
+    { id: 2, label: "Recent Projects", link: "/projects" },
     { id: 3, label: "Services", link: "/services" },
     // landing-page section links (navigate to home and scroll to id)
     { id: 4, label: "Values", link: "/#value" },
